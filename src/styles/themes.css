@@ -91,3 +91,28 @@
   --font-display: "Rockwell", "Roboto Condensed", "Arial Narrow", sans-serif;
   --font-body: "Roboto Condensed", "Arial Narrow", sans-serif;
 }
+
+/* Thème réaliste - appareil photo vintage avec noir texturé et ombres profondes */
+[data-theme="realistic"] {
+  --chassis-color: #0a0a0a;
+  --chassis-color-dark: #000000;
+  --body-color: #141414;
+  --body-color-dark: #080808;
+  --body-shadow: #000000;
+  --accent: #d8d8d8;
+  --accent-soft: #8a8a8a;
+  --viewfinder-bg: #000000;
+  --viewfinder-ring: #1c1c1c;
+  --dial-color: #121212;
+  --dial-text: #e0e0e0;
+  --flash-off: #2a2a2a;
+  --flash-on: #ff4444;
+  --paper: #121212;
+  --ink: #f0f0f0;
+  --ink-soft: #a0a0a0;
+  --font-display: "Rockwell", "Roboto Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Roboto Condensed", "Arial Narrow", sans-serif;
+  /* Textures et effets */
+  --chassis-texture: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231a1a1a' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --paper-texture: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+}

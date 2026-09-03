@@ -47,7 +47,11 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
     } catch (e) {
       setFeedback("La prise de vue a échoué, réessaie.");
     } finally {
-      if (torchWasLit) applyTorch(false);
+      // Toujours éteindre le flash matériel si on a tenté de l'allumer
+      if (flashOn) {
+        await applyTorch(false);
+        setFlashOn(false);
+      }
       setArmed(false);
       setCapturing(false);
       setTimeout(() => setFeedback(null), 3000);

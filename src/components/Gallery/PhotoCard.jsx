@@ -25,7 +25,11 @@ export default function PhotoCard({ photo, index, now, forceReveal, onOpen }) {
     let cancelled = false;
     if (isRevealed && !url) {
       getPhotoBase64(photo.id).then((data) => {
-        if (!cancelled && data) setUrl(data);
+        if (!cancelled && data) {
+          // Ajouter le préfixe data URL si ce n'est pas déjà un data URL complet
+          const urlWithPrefix = data.startsWith("data:") ? data : `data:image/jpeg;base64,${data}`;
+          setUrl(urlWithPrefix);
+        }
       });
     }
     return () => {
