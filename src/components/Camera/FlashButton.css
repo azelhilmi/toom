@@ -1,0 +1,35 @@
+.flash-button {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid var(--flash-off);
+  background: transparent;
+  color: var(--flash-off);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.flash-button--on {
+  border-color: var(--flash-on);
+  background: var(--flash-on);
+  color: #1a1a1a;
+  box-shadow: 0 0 12px var(--flash-on);
+}
+
+.flash-button__dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  border: 1.5px solid var(--chassis-color, #1a1a1a);
+}

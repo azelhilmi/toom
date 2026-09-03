@@ -1,0 +1,76 @@
+.photo-card {
+  background: #fff;
+  padding: 0.5rem 0.5rem 0.7rem;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.photo-card__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #1a1a1a;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+}
+
+.photo-card__frame:disabled {
+  cursor: default;
+}
+
+.photo-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-card__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  font-size: 0.7rem;
+  font-family: var(--font-body);
+}
+
+.photo-card__lock {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: #8a8a8a;
+  background: repeating-linear-gradient(45deg, #161616, #161616 8px, #1c1c1c 8px, #1c1c1c 16px);
+}
+
+.photo-card__lock span {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  text-align: center;
+  padding: 0 0.4rem;
+}
+
+.photo-card__caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.5rem 0.15rem 0;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+}
+
+.photo-card__number {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+.photo-card__meta {
+  color: #999;
+}

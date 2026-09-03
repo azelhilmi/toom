@@ -1,0 +1,32 @@
+.gallery {
+  padding: 1rem;
+}
+
+.gallery--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  text-align: center;
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  padding: 2rem;
+}
+
+.gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
+  user-select: none;
+}
+
+.gallery__cheat-banner {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--flash-on) 20%, transparent);
+  border: 1px solid var(--flash-on);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.8rem;
+}

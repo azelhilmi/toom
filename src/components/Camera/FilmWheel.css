@@ -1,0 +1,61 @@
+.film-wheel-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+
+.film-wheel {
+  position: relative;
+  width: 84px;
+  height: 30px;
+  border-radius: 6px;
+  background: var(--dial-color);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4), 0 3px 8px rgba(0, 0, 0, 0.5);
+  touch-action: none;
+  cursor: grab;
+  overflow: hidden;
+}
+
+.film-wheel--armed {
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4), 0 0 0 2px var(--flash-on);
+}
+
+.film-wheel--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.film-wheel__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--flash-on);
+  opacity: 0.45;
+  transition: width 0.05s linear;
+}
+
+.film-wheel__ridges {
+  position: absolute;
+  inset: 3px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.film-wheel__ridge {
+  width: 2px;
+  border-radius: 1px;
+  background: var(--dial-text);
+  opacity: 0.55;
+}
+
+.film-wheel-group__label {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: var(--accent-soft);
+  text-transform: uppercase;
+}

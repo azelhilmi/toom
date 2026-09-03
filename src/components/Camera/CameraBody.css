@@ -1,0 +1,143 @@
+.camera-body {
+  width: 100%;
+  max-width: 420px;
+  height: 100%;
+  min-height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+
+.camera-body__top {
+  position: relative;
+  flex: 1.1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem 1.5rem;
+  min-height: 0;
+}
+
+.camera-body__top-row {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.camera-body__viewfinder-wrap {
+  margin-top: auto;
+}
+
+.camera-body__label {
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--body-color) 0%, var(--body-color-dark) 100%);
+  border-top: 3px solid var(--body-shadow);
+  border-bottom: 3px solid var(--body-shadow);
+  padding: 1rem 1.1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.camera-body__brand {
+  display: flex;
+  flex-direction: column;
+  transform: rotate(-1.5deg);
+}
+
+.camera-body__brand-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.camera-body__brand-tagline {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  color: #c0392b;
+  font-style: italic;
+}
+
+.camera-body__bottom {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 0;
+}
+
+.camera-body__hint {
+  margin: 0.8rem 1rem 0;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: #999;
+  text-align: center;
+  min-height: 1.6em;
+}
+
+.camera-body__shutter-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-body__shutter {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(180deg, #333 0%, #111 100%);
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.camera-body__shutter:not(:disabled) {
+  background: linear-gradient(180deg, #e63946 0%, #a11d1d 100%);
+}
+
+.camera-body__shutter:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.camera-body__shutter:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.camera-body__shutter-ring {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.camera-body__shutter-row .flash-button {
+  position: absolute;
+  right: calc(50% - 100px);
+  top: -8px;
+}
+
+/* Orientation paysage : on garde exactement la même disposition
+   verticale qu'en portrait (viseur centré, bandeau, déclencheur) — elle
+   s'étire simplement sur toute la largeur disponible au lieu d'être
+   plafonnée à 420px. Les zones sont assez basses en hauteur (viseur
+   96px, bandeau ~110px, déclencheur 72px) pour tenir sans problème dans
+   une hauteur de paysage réduite. */
+@media (orientation: landscape) {
+  .camera-body {
+    max-width: none;
+  }
+}

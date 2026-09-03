@@ -1,0 +1,26 @@
+.event-dashboard {
+  max-width: 720px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+
+.event-dashboard h2 {
+  font-family: var(--font-display);
+}
+
+.event-dashboard__guest {
+  margin-bottom: 1.75rem;
+}
+
+.event-dashboard__guest h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.event-dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 6px;
+}

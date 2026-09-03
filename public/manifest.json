@@ -1,0 +1,13 @@
+{
+  "name": "Toom",
+  "short_name": "Toom",
+  "description": "Appareil photo jetable virtuel — pas d'aperçu, révélation 24h après.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#101010",
+  "theme_color": "#f5c518",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
