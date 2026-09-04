@@ -91,6 +91,23 @@ service cloud.firestore {
       );
     }
 
+    // userCustomizations/{uid} et customThemes/{uid} : personnalisation
+    // du compte (fond d'écran, thème complet créé via le customisateur).
+    // Chacun ne gère que son propre document. Ces règles manquaient
+    // entièrement jusqu'ici — toute lecture/écriture était donc bloquée
+    // silencieusement par le refus par défaut de Firestore, ce qui
+    // cassait le customisateur pour tout le monde sans message d'erreur
+    // visible côté interface.
+    match /userCustomizations/{uid} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    match /customThemes/{uid} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == uid;
+    }
+
     // events/{eventId}
     match /events/{eventId} {
       allow read: if isSignedIn();
