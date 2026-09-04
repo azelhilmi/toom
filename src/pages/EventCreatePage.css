@@ -45,3 +45,62 @@
   font-family: monospace;
   font-size: 0.75rem;
 }
+
+.event-form__code-input {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: monospace;
+  text-align: center;
+  font-size: 1.1rem !important;
+}
+
+.event-form__error {
+  color: #c0392b;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.event-form__qr {
+  align-self: center;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.6rem;
+}
+
+.event-form__code-display {
+  text-align: center;
+  font-family: monospace;
+  font-size: 1.4rem;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  color: var(--ink);
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.7rem;
+}
+
+.event-form__secondary {
+  background: transparent;
+  border: 1px solid var(--ink-soft);
+  color: var(--ink);
+}
+
+.event-form__colors {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+.event-form__color-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+}
+
+.event-form__color-field input[type="color"] {
+  width: 100%;
+  height: 36px;
+  padding: 2px;
+  cursor: pointer;
+}

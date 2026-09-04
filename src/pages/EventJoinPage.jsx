@@ -8,7 +8,7 @@ import "./EventCreatePage.css";
 export default function EventJoinPage() {
   const { inviteCode } = useParams();
   const navigate = useNavigate();
-  const { setTheme } = useTheme();
+  const { setTheme, setCustomColors } = useTheme();
   const [event, setEvent] = useState(undefined);
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -26,6 +26,9 @@ export default function EventJoinPage() {
     setSubmitting(true);
     const user = await setDisplayName(name.trim());
     await joinEvent(event.id, user.uid, name.trim(), event.shotsPerGuest, event.theme);
+    if (event.theme === "custom" && event.customColors) {
+      setCustomColors(event.customColors);
+    }
     setTheme(event.theme);
     navigate(`/event/${event.id}/camera`);
   }

@@ -19,15 +19,17 @@ service cloud.firestore {
     // par l'app avant de créer la pellicule du jour — un get() sur un
     // document qui n'existe pas encore ne peut pas être filtré sur son
     // ownerId puisque resource.data n'existe pas dans ce cas). Seules
-    // la création et la modification restent réservées au propriétaire.
+    // la création et la modification restent réservées au propriétaire —
+    // sauf pour l'organisateur d'un événement, qui peut ajuster le quota
+    // ou réinitialiser la pellicule de ses invités.
     match /cameras/{cameraId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      // shotsUsed ne peut être incrémenté que par le propriétaire, et jamais
-      // au-delà du quota alloué (contrôle du 24 photos/jour côté serveur)
-      allow update: if isSignedIn()
-        && resource.data.ownerId == request.auth.uid
-        && request.resource.data.shotsUsed <= resource.data.shotsAllowed;
+      allow update: if isSignedIn() && (
+        (resource.data.ownerId == request.auth.uid && request.resource.data.shotsUsed <= resource.data.shotsAllowed) ||
+        (resource.data.eventId != null &&
+          get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid)
+      );
     }
 
     // photos/{photoId} : métadonnées légères (pas l'image elle-même).
@@ -37,6 +39,8 @@ service cloud.firestore {
     // rend l'easter egg de la galerie cohérent : il "triche" réellement,
     // il ne contourne pas une vraie protection serveur. Voir photoData
     // ci-dessous pour le même choix appliqué à l'image elle-même.
+    // La suppression est réservée au propriétaire ou à l'organisateur de
+    // l'événement (réinitialisation de la pellicule d'un invité).
     match /photos/{photoId} {
       allow read: if isSignedIn() && (
         resource.data.ownerId == request.auth.uid ||
@@ -44,6 +48,11 @@ service cloud.firestore {
         get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid
       );
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow delete: if isSignedIn() && (
+        resource.data.ownerId == request.auth.uid ||
+        (resource.data.eventId != null &&
+          get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid)
+      );
     }
 
     // photoData/{photoId} : manifeste (nombre de morceaux), pas l'image
@@ -57,6 +66,11 @@ service cloud.firestore {
           get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid)
       );
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow delete: if isSignedIn() && (
+        resource.data.ownerId == request.auth.uid ||
+        (resource.data.eventId != null &&
+          get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid)
+      );
     }
 
     // photoDataChunks/{photoId_i} : les morceaux de l'image elle-même
@@ -70,6 +84,11 @@ service cloud.firestore {
           get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid)
       );
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow delete: if isSignedIn() && (
+        resource.data.ownerId == request.auth.uid ||
+        (resource.data.eventId != null &&
+          get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid)
+      );
     }
 
     // events/{eventId}

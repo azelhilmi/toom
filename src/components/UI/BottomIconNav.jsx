@@ -4,7 +4,7 @@ import "./BottomIconNav.css";
 export default function BottomIconNav() {
   return (
     <div className="bottom-icon-nav">
-      <Link to="/event/new" className="bottom-icon-nav__button" aria-label="Créer un événement" title="Événement">
+      <Link to="/event" className="bottom-icon-nav__button" aria-label="Événement" title="Événement">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
           <path
             fill="currentColor"
