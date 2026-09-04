@@ -104,6 +104,20 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
         }
       />
 
+      {/* Sur une image personnalisée uniquement : le masque est réappliqué
+          par-dessus, cette fois en tant qu'image visible (fusion "multiply")
+          plutôt que comme découpe alpha. Ça restitue le relief du boîtier
+          (contours du viseur, des boutons, de la molette) qui donnerait
+          sinon un aplat de photo sans plus aucun aspect "appareil photo". */}
+      {customSkin && (
+        <img
+          className="camera-body__skin-relief"
+          src={layout.mask}
+          alt=""
+          draggable={false}
+        />
+      )}
+
       {/* Couche 3 : zones fonctionnelles transparentes, superposées
           exactement à l'endroit où l'image dessine chaque contrôle. */}
       <div className="camera-body__hotspot" style={hotspotStyle(layout.shutter)}>
