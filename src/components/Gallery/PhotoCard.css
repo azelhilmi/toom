@@ -62,8 +62,8 @@
   justify-content: center;
   gap: 0.4rem;
   color: var(--accent-soft, #8a8a8a);
-  background: repeating-linear-gradient(45deg, var(--chassis-color-dark, #161616), var(--chassis-color-dark, #161616) 8px, var(--chassis-color, #1c1c1c) 8px, var(--chassis-color, #1c1c1c) 16px);
-  background-image: var(--chassis-texture, none);
+  background-color: var(--chassis-color, #1c1c1c);
+  background-image: repeating-linear-gradient(45deg, var(--chassis-color-dark, #161616), var(--chassis-color-dark, #161616) 8px, var(--chassis-color, #1c1c1c) 8px, var(--chassis-color, #1c1c1c) 16px), var(--chassis-texture, none);
 }
 
 .photo-card__lock span {
