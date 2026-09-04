@@ -77,24 +77,26 @@
 /* Thème "personnalisé" : les organisateurs d'événement peuvent injecter
    leurs propres valeurs (voir ThemeContext) sans créer de nouvelle classe. */
 [data-theme="custom"] {
-  --chassis-color: #1a1a1a;
-  --chassis-color-dark: #0d0d0d;
+  --chassis-color: var(--custom-chassis-color, #1a1a1a);
+  --chassis-color-dark: var(--custom-chassis-color-dark, #0d0d0d);
   --body-color: var(--custom-body-color, #f5c518);
   --body-color-dark: var(--custom-body-color-dark, #d9a800);
   --body-shadow: var(--custom-body-shadow, #8a6a00);
   --accent: var(--custom-accent, #1a1a1a);
   --accent-soft: var(--custom-accent-soft, #3a3a3a);
-  --viewfinder-bg: #101010;
-  --viewfinder-ring: #3a3a3a;
-  --dial-color: #2b2b2b;
+  --viewfinder-bg: var(--custom-viewfinder-bg, #101010);
+  --viewfinder-ring: var(--custom-viewfinder-ring, #3a3a3a);
+  --dial-color: var(--custom-dial-color, #2b2b2b);
   --dial-text: var(--custom-body-color, #f5c518);
-  --flash-off: #444444;
-  --flash-on: #ff5a3c;
-  --paper: #fff8e6;
-  --ink: #1a1a1a;
-  --ink-soft: #5c5240;
+  --flash-off: var(--custom-flash-off, #444444);
+  --flash-on: var(--custom-flash-on, #ff5a3c);
+  --paper: var(--custom-paper, #fff8e6);
+  --ink: var(--custom-ink, #1a1a1a);
+  --ink-soft: var(--custom-ink-soft, #5c5240);
   --font-display: "Rockwell", "Roboto Condensed", "Arial Narrow", sans-serif;
   --font-body: "Roboto Condensed", "Arial Narrow", sans-serif;
+  --chassis-texture: var(--custom-chassis-texture, url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.12'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"));
+  --paper-texture: var(--custom-paper-texture, url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.045'/%3E%3C/svg%3E"));
 }
 
 /* Thème réaliste - appareil photo vintage avec noir texturé et ombres profondes */

@@ -21,9 +21,7 @@
   overflow: hidden;
 }
 
-/* Reflet plastique diffus en haut du boîtier — casse l'aspect "à plat"
-   d'un simple aplat de couleur, comme la lumière qui accroche le
-   boîtier d'un vrai appareil. */
+/* Reflet plastique diffus en haut du boîtier */
 .camera-body::before {
   content: "";
   position: absolute;
@@ -61,8 +59,7 @@
 
 .camera-body__label {
   flex-shrink: 0;
-  background-color: var(--body-color);
-  background-image: linear-gradient(180deg, var(--body-color) 0%, var(--body-color-dark) 100%), var(--chassis-texture, none);
+  background: linear-gradient(180deg, var(--body-color) 0%, var(--body-color-dark) 100%), var(--chassis-texture, none);
   border-top: 3px solid var(--body-shadow);
   border-bottom: 3px solid var(--body-shadow);
   padding: 1rem 1.1rem;
@@ -88,14 +85,14 @@
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.6rem;
-  color: var(--accent);
+  color: var(--accent, #e0e0e0);
   line-height: 1;
 }
 
 .camera-body__brand-tagline {
   font-family: var(--font-body);
   font-size: 0.68rem;
-  color: #c0392b;
+  color: var(--ink-soft, #a0a0a0);
   font-style: italic;
 }
 
@@ -130,26 +127,17 @@
   height: 72px;
   border-radius: 50%;
   border: none;
-  background-color: #222;
-  background-image:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 42%),
-    linear-gradient(180deg, #333 0%, #111 100%),
-    var(--chassis-texture, none);
+  background: linear-gradient(180deg, #333 0%, #111 100%), var(--chassis-texture, none);
   cursor: pointer;
   position: relative;
   box-shadow:
-    0 5px 0 rgba(0, 0, 0, 0.55),
-    0 8px 14px rgba(0, 0, 0, 0.45),
+    0 4px 0 rgba(0, 0, 0, 0.5),
     inset 0 0 15px rgba(0, 0, 0, 0.8);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .camera-body__shutter:not(:disabled) {
-  background-color: #a11d1d;
-  background-image:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 42%),
-    linear-gradient(180deg, #e63946 0%, #a11d1d 100%),
-    var(--chassis-texture, none);
+  background: linear-gradient(180deg, #e63946 0%, #a11d1d 100%), var(--chassis-texture, none);
 }
 
 .camera-body__shutter:disabled {
@@ -169,12 +157,13 @@
   border: 2px solid rgba(255, 255, 255, 0.25);
 }
 
-/* Orientation paysage : on garde exactement la même disposition
-   verticale qu'en portrait (viseur centré, bandeau, déclencheur) — elle
-   s'étire simplement sur toute la largeur disponible au lieu d'être
-   plafonnée à 420px. Les zones sont assez basses en hauteur (viseur
-   96px, bandeau ~110px, déclencheur 72px) pour tenir sans problème dans
-   une hauteur de paysage réduite. */
+.camera-body__shutter-row .flash-button {
+  position: absolute;
+  right: calc(50% - 100px);
+  top: -8px;
+}
+
+/* Orientation paysage */
 @media (orientation: landscape) {
   .camera-body {
     max-width: none;

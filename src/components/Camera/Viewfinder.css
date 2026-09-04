@@ -25,7 +25,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(0.85) contrast(1.1) brightness(1.05) blur(1.5px) url(#fisheye-medium);
+  filter: saturate(0.85) contrast(1.1) brightness(1.05) blur(1.5px);
   transform: scale(0.88);
   transform-origin: center;
   opacity: 0.92;
@@ -48,41 +48,3 @@
   background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
 }
 
-.viewfinder__crosshair {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.viewfinder__crosshair span {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.35);
-}
-
-.viewfinder__crosshair span:first-child {
-  top: 50%;
-  left: 42%;
-  width: 16%;
-  height: 1px;
-}
-
-.viewfinder__crosshair span:last-child {
-  left: 50%;
-  top: 42%;
-  height: 16%;
-  width: 1px;
-}
-
-.viewfinder__flash-pulse {
-  position: fixed;
-  inset: 0;
-  background: white;
-  animation: flash-pulse 220ms ease-out;
-  z-index: 50;
-  pointer-events: none;
-}
-
-@keyframes flash-pulse {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}

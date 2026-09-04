@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { getCustomBackground, listenToCustomization, listenToCustomTheme } from "../firebase/firestore";
-import { DEFAULT_COLORS, themeToCssVariables } from "../utils/themeUtils";
+import { DEFAULT_COLORS, DEFAULT_ELEMENTS, DEFAULT_EFFECTS } from "../utils/themeUtils";
 
 const ThemeContext = createContext(null);
 
@@ -17,32 +17,41 @@ export function ThemeProvider({ children, initialTheme = "kodak-funsaver" }) {
     document.documentElement.setAttribute("data-theme", theme);
     const root = document.documentElement.style;
     
-    // Appliquer les couleurs custom si thème personnalisé
-    if (theme === "custom" && customColors) {
-      root.setProperty("--custom-body-color", customColors.bodyColor);
-      root.setProperty("--custom-body-color-dark", customColors.bodyColorDark);
-      root.setProperty("--custom-body-shadow", customColors.bodyShadow);
-      root.setProperty("--custom-accent", customColors.accent);
-      root.setProperty("--custom-accent-soft", customColors.accentSoft);
-    }
-    
-    // Appliquer le background custom
-    if (customBackground) {
-      root.setProperty("--custom-background", `url(${customBackground})`);
-    } else {
+    // Réinitialiser les variables custom si on quitte le thème custom
+    if (theme !== "custom") {
+      // Réappliquer les valeurs par défaut du thème standard
+      Object.entries(DEFAULT_COLORS).forEach(([key, value]) => {
+        root.setProperty(`--custom-${key}`, '');
+      });
       root.setProperty("--custom-background", "");
     }
     
     // Appliquer les couleurs du thème custom complet
-    if (customTheme?.colors) {
+    if (theme === "custom" && customTheme?.colors) {
       Object.entries(customTheme.colors).forEach(([key, value]) => {
         root.setProperty(`--custom-${key}`, value);
       });
     }
     
     // Appliquer le background du thème custom complet
-    if (customTheme?.background) {
+    if (theme === "custom" && customTheme?.background) {
       root.setProperty("--custom-background", `url(${customTheme.background})`);
+    } else {
+      root.setProperty("--custom-background", "");
+    }
+    
+    // Appliquer les couleurs custom (pour compatibilité descendante)
+    if (theme === "custom" && customColors) {
+      root.setProperty("--custom-body-color", customColors.bodyColor || '');
+      root.setProperty("--custom-body-color-dark", customColors.bodyColorDark || '');
+      root.setProperty("--custom-body-shadow", customColors.bodyShadow || '');
+      root.setProperty("--custom-accent", customColors.accent || '');
+      root.setProperty("--custom-accent-soft", customColors.accentSoft || '');
+    }
+    
+    // Appliquer le background custom (pour compatibilité descendante)
+    if (customBackground) {
+      root.setProperty("--custom-background", `url(${customBackground})`);
     }
   }, [theme, customColors, customBackground, customTheme]);
 
@@ -65,16 +74,13 @@ export function ThemeProvider({ children, initialTheme = "kodak-funsaver" }) {
     const unsub = listenToCustomTheme(user.uid, (themeData) => {
       if (themeData) {
         setCustomTheme(themeData);
-        // Si un thème custom existe, basculer automatiquement dessus
-        if (theme !== "custom") {
-          setTheme("custom");
-        }
+        // Ne pas basculer automatiquement - laisser l'utilisateur choisir
       } else {
         setCustomTheme(null);
       }
     });
     return unsub;
-  }, [user?.uid, theme]);
+  }, [user?.uid]);
 
   // Synchroniser customColors depuis customTheme
   useEffect(() => {
