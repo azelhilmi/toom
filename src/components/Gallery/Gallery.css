@@ -1,6 +1,6 @@
 .gallery {
   padding: 1rem;
-  background: var(--paper, #f8f8f8);
+  background: var(--paper, #101010);
   background-image: var(--paper-texture, none);
   min-height: calc(100% - 2rem);
 }
@@ -11,7 +11,7 @@
   justify-content: center;
   min-height: 40vh;
   text-align: center;
-  color: var(--ink-soft);
+  color: var(--ink-soft, #999);
   font-family: var(--font-body);
   padding: 2rem;
 }
@@ -27,12 +27,12 @@
 .gallery__cheat-banner {
   font-family: var(--font-body);
   font-size: 0.8rem;
-  color: var(--ink);
-  background: color-mix(in srgb, var(--flash-on) 20%, transparent);
+  color: var(--ink, #eee);
+  background: color-mix(in srgb, var(--body-color, #f5c518) 20%, transparent);
   background-image: var(--paper-texture, none);
-  border: 1px solid var(--flash-on);
+  border: 1px solid var(--body-color, #f5c518);
   border-radius: 6px;
   padding: 0.6rem 0.8rem;
   margin-bottom: 0.8rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }

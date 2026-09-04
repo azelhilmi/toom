@@ -3,8 +3,8 @@
   margin: 0 auto;
   padding: 2rem 1.2rem;
   min-height: 100%;
-  background: #101010;
-  color: #eee;
+  background: var(--paper, #101010);
+  color: var(--ink, #eee);
   font-family: var(--font-body);
   display: flex;
   flex-direction: column;
@@ -17,7 +17,7 @@
 }
 
 .event-hub > p {
-  color: #999;
+  color: var(--ink-soft, #999);
   font-size: 0.85rem;
   margin: 0 0 1.6rem;
 }
@@ -28,8 +28,8 @@
   gap: 0.3rem;
   padding: 1.1rem 1.2rem;
   border-radius: 12px;
-  background: #181818;
-  border: 1px solid #2a2a2a;
+  background: var(--accent-soft, #181818);
+  border: 1px solid var(--ink-soft, #2a2a2a);
   text-decoration: none;
   margin-bottom: 0.8rem;
 }
@@ -41,14 +41,14 @@
 }
 
 .event-hub__card-desc {
-  color: #999;
+  color: var(--ink-soft, #999);
   font-size: 0.78rem;
 }
 
 .event-hub__back {
   margin-top: 1.2rem;
   text-align: center;
-  color: #777;
+  color: var(--ink-soft, #999);
   font-size: 0.8rem;
   text-decoration: none;
 }

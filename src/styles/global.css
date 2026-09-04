@@ -11,9 +11,9 @@ html, body, #root {
 }
 
 body {
-  background: var(--paper);
+  background: var(--paper, #101010);
   font-family: var(--font-body);
-  color: var(--ink);
+  color: var(--ink, #eee);
   background-image: var(--paper-texture, none);
   min-height: 100%;
 }
@@ -23,6 +23,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--paper, #101010);
 }
 
 .app-main {
@@ -35,11 +36,22 @@ body {
 
 .page-loading {
   text-align: center;
-  color: var(--ink-soft);
+  color: var(--ink-soft, #999);
   font-family: var(--font-body);
   padding: 3rem 1rem;
 }
 
 button {
   font-family: inherit;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  background: var(--paper, #181818);
+  color: var(--ink, #eee);
+  border-color: var(--ink-soft, #444);
+}
+
+input::placeholder {
+  color: var(--ink-soft, #666);
 }
