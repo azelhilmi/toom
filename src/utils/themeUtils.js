@@ -4,8 +4,6 @@
 
 // Éléments personnalisables avec leurs propriétés par défaut
 // Les positions sont en % pour s'adapter à toutes les tailles
-// Les tailles sont en % de la dimension du conteneur
-
 export const DEFAULT_ELEMENTS = {
   viewfinder: {
     id: 'viewfinder',
@@ -15,15 +13,7 @@ export const DEFAULT_ELEMENTS = {
     position: { x: 50, y: 45 },
     size: 24,
     zIndex: 5,
-    // Positions spécifiques pour paysage
-    landscape: { x: 30, y: 50, size: 20 },
-    // Effets
-    effects: {
-      fisheye: true,
-      fisheyeIntensity: 0.5, // 0-1
-      blur: 1.5,
-      vignette: true
-    }
+    landscape: { x: 30, y: 50, size: 20 }
   },
   shutter: {
     id: 'shutter',
@@ -43,7 +33,7 @@ export const DEFAULT_ELEMENTS = {
     position: { x: 21, y: 7 },
     size: 20,
     zIndex: 10,
-    landscape: { x: 21, y: 7, size: 20 }
+    landscape: { x: 15, y: 5, size: 15 }
   },
   filmWheel: {
     id: 'filmWheel',
@@ -53,7 +43,7 @@ export const DEFAULT_ELEMENTS = {
     position: { x: 88, y: 5 },
     size: 20,
     zIndex: 10,
-    landscape: { x: 88, y: 5, size: 20 }
+    landscape: { x: 90, y: 5, size: 15 }
   },
   poseCounter: {
     id: 'poseCounter',
@@ -63,7 +53,7 @@ export const DEFAULT_ELEMENTS = {
     position: { x: 9, y: 7 },
     size: 20,
     zIndex: 10,
-    landscape: { x: 9, y: 7, size: 20 }
+    landscape: { x: 5, y: 5, size: 15 }
   },
   brandName: {
     id: 'brandName',
@@ -71,10 +61,10 @@ export const DEFAULT_ELEMENTS = {
     type: 'text',
     icon: '🏷️',
     position: { x: 15, y: 60 },
-    size: 12,
+    size: 20,
     zIndex: 15,
-    landscape: { x: 5, y: 55, size: 10 },
-    text: 'TOOM'
+    landscape: { x: 10, y: 55, size: 15 },
+    text: 'Toom'
   },
   brandTagline: {
     id: 'brandTagline',
@@ -82,10 +72,10 @@ export const DEFAULT_ELEMENTS = {
     type: 'text',
     icon: '💬',
     position: { x: 15, y: 65 },
-    size: 8,
+    size: 20,
     zIndex: 15,
-    landscape: { x: 5, y: 60, size: 6 },
-    text: 'We\'ll see tomorrow'
+    landscape: { x: 10, y: 60, size: 15 },
+    text: "We'll see tomorrow"
   }
 };
 
@@ -93,24 +83,23 @@ export const DEFAULT_ELEMENTS = {
 export const DEFAULT_COLORS = {
   chassisColor: '#0a0a0a',
   chassisColorDark: '#000000',
-  bodyColor: '#141414',
-  bodyColorDark: '#080808',
-  bodyShadow: '#000000',
-  accent: '#e0e0e0',
-  accentSoft: '#9a9a9a',
-  viewfinderBg: '#000000',
-  viewfinderRing: '#1c1c1c',
-  flashOn: '#ff4444',
-  flashOff: '#2a2a2a',
-  paper: '#121212',
-  ink: '#f0f0f0',
-  inkSoft: '#a0a0a0'
+  bodyColor: '#f5c518',
+  bodyColorDark: '#d9a800',
+  bodyShadow: '#8a6a00',
+  accent: '#1a1a1a',
+  accentSoft: '#3a3a3a',
+  viewfinderBg: '#101010',
+  viewfinderRing: '#3a3a3a',
+  flashOn: '#ff5a3c',
+  flashOff: '#444444',
+  ink: '#1a1a1a',
+  inkSoft: '#5c5240'
 };
 
-// Effets par défaut
+// Effets par défaut (fisheye désactivé par défaut pour éviter déformation)
 export const DEFAULT_EFFECTS = {
-  fisheye: true,
-  fisheyeIntensity: 0.5,
+  fisheye: false,
+  fisheyeIntensity: 0.3,
   blur: 1.5,
   vignette: true
 };
@@ -174,35 +163,28 @@ export function getElementConfig(element, elements, isLandscape) {
 // Génère le filtre CSS pour le viseur en fonction de l'intensité fisheye
 export function getFisheyeFilter(intensity = 0.5) {
   if (!intensity || intensity === 0) return 'none';
-  
-  // Map l'intensité (0-1) à une échelle (0-30)
-  const scale = Math.round(intensity * 30);
   const blur = intensity * 0.3;
-  
+  const scale = Math.round(intensity * 30);
   return `blur(${blur}px) url(#fisheye-medium)`;
 }
 
 // Convertit un thème en CSS custom properties
 export function themeToCssVariables(theme) {
   const variables = [];
-  
-  // Couleurs
-  for (const [key, value] of Object.entries(theme.colors || {})) {
-    variables.push(`--custom-${key}: ${value};`);
+  if (theme.colors) {
+    Object.entries(theme.colors).forEach(([key, value]) => {
+      variables.push(`--custom-${key}: ${value};`);
+    });
   }
-  
-  // Background
   if (theme.background) {
     variables.push(`--custom-background: url(${theme.background});`);
   }
-  
   return variables.join(' ');
 }
 
 // Valide les positions des éléments (doivent être entre 0 et 100)
 export function validateElementPositions(elements) {
   const validated = { ...elements };
-  
   for (const [key, element] of Object.entries(validated)) {
     if (element.position) {
       validated[key] = {
@@ -213,11 +195,9 @@ export function validateElementPositions(elements) {
         }
       };
     }
-    
     if (element.size !== undefined) {
       validated[key].size = Math.max(1, Math.min(100, element.size));
     }
-    
     if (element.landscape) {
       validated[key].landscape = {
         ...element.landscape,
@@ -229,6 +209,5 @@ export function validateElementPositions(elements) {
       };
     }
   }
-  
   return validated;
 }

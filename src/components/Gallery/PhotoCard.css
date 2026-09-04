@@ -1,21 +1,21 @@
 .photo-card {
-  background: var(--accent-soft, #fff);
+  background: var(--accent-soft, #181818);
   background-image: var(--paper-texture, none);
   padding: 0.6rem 0.6rem 0.8rem;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
   border: 1px solid var(--chassis-color-dark, #000);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .photo-card:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .photo-card:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .photo-card__frame {
@@ -30,7 +30,7 @@
   padding: 0;
   cursor: pointer;
   display: block;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
 }
 
 .photo-card__frame[aria-disabled="true"] {
@@ -49,7 +49,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #999;
+  color: var(--ink-soft, #999);
   font-size: 0.7rem;
   font-family: var(--font-body);
 }
@@ -83,10 +83,10 @@
 }
 
 .photo-card__number {
-  color: #c0392b;
+  color: var(--body-color, #f5c518);
   font-weight: 700;
 }
 
 .photo-card__meta {
-  color: #999;
+  color: var(--ink-soft, #999);
 }
