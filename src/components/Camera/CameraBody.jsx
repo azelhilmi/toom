@@ -8,6 +8,7 @@ import InstructionsOverlay from "./InstructionsOverlay";
 import DevelopClock from "./DevelopClock";
 import { useCameraStream } from "../../utils/useCameraStream";
 import { requestAppFullscreen } from "../../utils/fullscreen";
+import { hapticCapture } from "../../utils/haptics";
 import { useTheme } from "../../context/ThemeContext";
 import { HOTSPOTS, hotspotStyle } from "../../utils/hotspots";
 import "./CameraBody.css";
@@ -60,6 +61,7 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
     }
 
     try {
+      hapticCapture();
       await onCapture(videoRef.current, flashOn);
       setFeedback("Cliché capturé. Rendez-vous demain pour le découvrir.");
     } catch (e) {
