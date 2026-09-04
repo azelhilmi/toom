@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { setDisplayName } from "../firebase/auth";
 import { getEventByInviteCode, joinEvent } from "../firebase/firestore";
 import "./EventCreatePage.css";
+import LoadingScreen from "../components/UI/LoadingScreen";
 
 export default function EventJoinPage() {
   const { inviteCode } = useParams();
@@ -15,7 +16,7 @@ export default function EventJoinPage() {
     getEventByInviteCode(inviteCode).then(setEvent);
   }, [inviteCode]);
 
-  if (event === undefined) return <p className="page-loading">Chargement…</p>;
+  if (event === undefined) return <LoadingScreen />;
   if (event === null) return <p className="page-loading">Ce lien d'invitation n'est plus valide.</p>;
 
   async function handleSubmit(e) {

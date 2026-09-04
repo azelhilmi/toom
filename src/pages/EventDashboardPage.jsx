@@ -8,6 +8,7 @@ import {
 } from "../firebase/firestore";
 import { downloadPhotosAsZip } from "../utils/downloadAlbum";
 import "./EventDashboardPage.css";
+import LoadingScreen from "../components/UI/LoadingScreen";
 
 function toDatetimeLocalValue(timestamp) {
   if (!timestamp?.toDate) return "";
@@ -109,7 +110,7 @@ export default function EventDashboardPage() {
     setZipProgress(null);
   }
 
-  if (!event || !form) return <p className="page-loading">Chargement…</p>;
+  if (!event || !form) return <LoadingScreen />;
 
   return (
     <div className="event-dashboard">

@@ -4,6 +4,8 @@ import FilmWheel from "./FilmWheel";
 import PoseCounter from "./PoseCounter";
 import FlashButton from "./FlashButton";
 import BottomIconNav from "../UI/BottomIconNav";
+import InstructionsOverlay from "./InstructionsOverlay";
+import DevelopClock from "./DevelopClock";
 import { useCameraStream } from "../../utils/useCameraStream";
 import { requestAppFullscreen } from "../../utils/fullscreen";
 import { useTheme } from "../../context/ThemeContext";
@@ -23,7 +25,7 @@ function useOrientation() {
   return isLandscape ? "landscape" : "portrait";
 }
 
-export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) {
+export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, developingUntilMs = null, onReload = null }) {
   const { videoRef, error, ready, torchSupported, applyTorch } = useCameraStream();
   const { customSkin } = useTheme();
   const orientation = useOrientation();
@@ -116,12 +118,23 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
         />
       </div>
 
+      {/* Zone vide de l'image : instructions d'usage tant qu'il reste de
+          la pellicule, ou horloge de développement (non bloquante — le
+          reste de l'app reste utilisable) une fois épuisée. */}
+      <div className="camera-body__hotspot camera-body__instructions" style={hotspotStyle(layout.instructionsZone)}>
+        {developingUntilMs ? (
+          <DevelopClock targetMs={developingUntilMs} ready={!!onReload} onReload={onReload} />
+        ) : (
+          <InstructionsOverlay wheelAxis={layout.wheelAxis} />
+        )}
+      </div>
+
       {/* Retour discret (nombre de poses ne suffit pas toujours à faire
           comprendre l'état armé/désarmé) + navigation, en surimpression. */}
       <div className="camera-body__overlay-footer">
         <p className="camera-body__hint" role="status">
           {outOfFilm
-            ? "Pellicule terminée."
+            ? "Pellicule épuisée — regarde l'heure de développement ci-dessus."
             : feedback
             ? feedback
             : armed

@@ -4,6 +4,7 @@ import Gallery from "../components/Gallery/Gallery";
 import { useAuth } from "../context/AuthContext";
 import { listenToPhotos } from "../firebase/firestore";
 import "./GalleryPage.css";
+import LoadingScreen from "../components/UI/LoadingScreen";
 
 export default function GalleryPage() {
   const { user, ready } = useAuth();
@@ -15,12 +16,13 @@ export default function GalleryPage() {
     return unsub;
   }, [ready, user]);
 
-  if (!ready) return <p className="page-loading">Chargement…</p>;
+  if (!ready) return <LoadingScreen />;
 
   return (
     <div className="gallery-page">
       <header className="gallery-page__header">
         <div>
+          <img src="/brand/wordmark-small.webp" alt="" className="page-header-logo" />
           <h1>Labo Photo</h1>
           <p>Vos souvenirs, développés.</p>
         </div>

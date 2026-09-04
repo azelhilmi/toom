@@ -48,6 +48,7 @@ export default function SettingsPage() {
     <div className="settings-page">
       <header className="settings-page__header">
         <div>
+          <img src="/brand/wordmark-small.webp" alt="" className="page-header-logo" />
           <h1>Réglages</h1>
           <p>Personnalise l'apparence de ton appareil.</p>
         </div>

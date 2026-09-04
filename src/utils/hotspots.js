@@ -25,6 +25,9 @@ export const HOTSPOTS = {
     flashButton: { x: 71, y: 12.3, w: 9.3, h: 9.3 },
     shutter: { x: 49.7, y: 75.8, w: 16, h: 16 },
     filmWheel: { x: 91, y: 11, w: 13, h: 9 },
+    // Zone vide entre la grip du haut et la zone déclencheur/poses du
+    // bas — accueille l'overlay d'instructions imprimées.
+    instructionsZone: { x: 42, y: 48, w: 78, h: 34 },
   },
   portrait: {
     skin: "/skins/default-vertical.webp",
@@ -34,6 +37,7 @@ export const HOTSPOTS = {
     flashButton: { x: 84.6, y: 26.2, w: 14, h: 14 },
     shutter: { x: 48.9, y: 73.3, w: 18, h: 18 },
     filmWheel: { x: 89.9, y: 8.9, w: 6, h: 11 },
+    instructionsZone: { x: 46, y: 42, w: 88, h: 40 },
   },
 };
 

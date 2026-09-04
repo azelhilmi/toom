@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import CameraBody from "../components/Camera/CameraBody";
 import { useAuth } from "../context/AuthContext";
 import { listenToRoll, takePhoto, getEvent } from "../firebase/firestore";
+import LoadingScreen from "../components/UI/LoadingScreen";
 
 export default function EventCameraPage() {
   const { eventId } = useParams();
@@ -19,7 +20,7 @@ export default function EventCameraPage() {
   }, [ready, user, eventId]);
 
   if (!ready || !roll || !event) {
-    return <p className="page-loading">Chargement de ta pellicule d'événement…</p>;
+    return <LoadingScreen message="Chargement de ta pellicule d'événement…" />;
   }
 
   async function handleCapture(videoEl, flashUsed) {
@@ -37,11 +38,15 @@ export default function EventCameraPage() {
     });
   }
 
+  const isFull = roll.shotsUsed >= roll.shotsAllowed;
+  const revealAtMs = event.revealAt?.toMillis ? event.revealAt.toMillis() : null;
+
   return (
     <CameraBody
       shotsRemaining={roll.shotsAllowed - roll.shotsUsed}
       shotsAllowed={roll.shotsAllowed}
       onCapture={handleCapture}
+      developingUntilMs={isFull ? revealAtMs : null}
     />
   );
 }

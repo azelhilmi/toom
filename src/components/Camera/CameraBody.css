@@ -30,6 +30,10 @@
   z-index: 3;
 }
 
+.camera-body__instructions {
+  pointer-events: none;
+}
+
 .camera-body__hotspot,
 .camera-body__viewfinder-slot,
 .camera-body__pose-slot {

@@ -55,3 +55,11 @@ input, select, textarea {
 input::placeholder {
   color: var(--ink-soft, #666);
 }
+
+.page-header-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+  margin-bottom: 0.3rem;
+}
