@@ -8,8 +8,8 @@ export default function InstructionsOverlay({ wheelAxis }) {
 
       <ol className="instructions-overlay__steps">
         <li>
-          <strong>1.</strong> Tournez la <strong>molette d'avancement</strong>{" "}
-          {wheelAxis === "horizontal" ? "vers la droite" : "vers le bas"} jusqu'à l'arrêt
+          <strong>1.</strong> Tournez la <strong>molette</strong>{" "}
+          {wheelAxis === "horizontal" ? "à droite" : "vers le bas"} jusqu'à l'arrêt
         </li>
         <li>
           <strong>2.</strong> Cadrez le sujet avec le viseur
@@ -17,15 +17,13 @@ export default function InstructionsOverlay({ wheelAxis }) {
         <li>
           <strong>3.</strong> Appuyez à fond sur le <strong>déclencheur</strong>
         </li>
+        <li>
+          <strong>⚡</strong> Le petit éclair active le <strong>flash</strong> (intérieur / faible luminosité)
+        </li>
       </ol>
 
-      <div className="instructions-overlay__tip">
-        <strong>Conseil Toom —</strong> le flash s'utilise en intérieur ou par faible
-        luminosité, pour une portée de 1,2 m à 3 m environ.
-      </div>
-
       <div className="instructions-overlay__brand">
-        <BrandMark size="small" />
+        <BrandMark size="small" withTagline={false} />
       </div>
     </div>
   );

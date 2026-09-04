@@ -130,22 +130,34 @@ function applyGrain(ctx, width, height, intensity) {
  * @returns {Promise<Blob>}
  */
 export async function resizeToWebP(imageBlob, maxWidth = 420, quality = 0.75) {
+  // Les photos iPhone sont souvent en HEIC/HEIF par défaut — un format
+  // que <img>/canvas ne savent PAS décoder nativement dans la plupart
+  // des navigateurs. Sans conversion préalable, l'image échoue
+  // silencieusement au chargement (onerror), d'où "Échec du traitement
+  // de l'image" même sur un fichier parfaitement valide.
+  const isHeic = /image\/hei[cf]/i.test(imageBlob.type) || /\.hei[cf]$/i.test(imageBlob.name || "");
+  if (isHeic) {
+    const heic2any = (await import("heic2any")).default;
+    const converted = await heic2any({ blob: imageBlob, toType: "image/jpeg", quality: 0.9 });
+    imageBlob = Array.isArray(converted) ? converted[0] : converted;
+  }
+
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(imageBlob);
-    
+
     img.onload = () => {
       URL.revokeObjectURL(url);
-      const ratio = maxWidth / img.width;
-      const newWidth = Math.min(img.width, maxWidth);
+      const ratio = Math.min(1, maxWidth / img.width);
+      const newWidth = Math.round(img.width * ratio);
       const newHeight = Math.round(img.height * ratio);
-      
+
       const canvas = document.createElement('canvas');
       canvas.width = newWidth;
       canvas.height = newHeight;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, newWidth, newHeight);
-      
+
       canvas.toBlob(
         (blob) => {
           if (blob) {
@@ -160,12 +172,12 @@ export async function resizeToWebP(imageBlob, maxWidth = 420, quality = 0.75) {
         quality
       );
     };
-    
+
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error('Échec du chargement de l image'));
+      reject(new Error(`Format d'image non supporté (${imageBlob.type || "inconnu"})`));
     };
-    
+
     img.src = url;
   });
 }

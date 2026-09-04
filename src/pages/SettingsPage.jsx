@@ -31,7 +31,8 @@ export default function SettingsPage() {
       await saveCustomBackground(user.uid, optimized);
       setCustomSkin(optimized);
     } catch {
-      setUploadError("Échec du traitement de l'image.");
+      console.error("Erreur upload skin:", err);
+      setUploadError(err?.message || "Échec du traitement de l'image.");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -48,7 +49,7 @@ export default function SettingsPage() {
     <div className="settings-page">
       <header className="settings-page__header">
         <div>
-          <img src="/brand/wordmark-small.webp" alt="" className="page-header-logo" />
+          <img src="/brand/icon-round-small.webp" alt="" className="page-header-logo" />
           <h1>Réglages</h1>
           <p>Personnalise l'apparence de ton appareil.</p>
         </div>

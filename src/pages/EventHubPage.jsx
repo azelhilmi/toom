@@ -4,7 +4,7 @@ import "./EventHubPage.css";
 export default function EventHubPage() {
   return (
     <div className="event-hub">
-      <img src="/brand/wordmark-small.webp" alt="" className="page-header-logo" />
+      <img src="/brand/icon-round-small.webp" alt="" className="page-header-logo" />
       <h1>Événement</h1>
       <p>Organise une pellicule partagée pour un mariage, un anniversaire, une soirée…</p>
 

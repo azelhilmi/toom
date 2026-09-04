@@ -22,7 +22,7 @@ export default function GalleryPage() {
     <div className="gallery-page">
       <header className="gallery-page__header">
         <div>
-          <img src="/brand/wordmark-small.webp" alt="" className="page-header-logo" />
+          <img src="/brand/icon-round-small.webp" alt="" className="page-header-logo" />
           <h1>Labo Photo</h1>
           <p>Vos souvenirs, développés.</p>
         </div>
