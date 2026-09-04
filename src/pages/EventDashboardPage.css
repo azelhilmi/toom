@@ -3,7 +3,8 @@
   margin: 1.5rem auto;
   padding: 0 1rem 2rem;
   font-family: var(--font-body);
-  color: var(--ink);
+  color: var(--ink, #eee);
+  background: var(--paper, #101010);
 }
 
 .event-dashboard__header {
@@ -17,10 +18,11 @@
 .event-dashboard__header h2 {
   font-family: var(--font-display);
   margin: 0;
+  color: var(--ink, #eee);
 }
 
 .event-dashboard__subtitle {
-  color: var(--ink-soft);
+  color: var(--ink-soft, #999);
   font-size: 0.8rem;
   margin: 0.2rem 0 0;
 }
@@ -34,9 +36,9 @@
 .event-dashboard__btn {
   padding: 0.55rem 0.9rem;
   border-radius: 8px;
-  border: 1px solid var(--ink-soft);
-  background: transparent;
-  color: var(--ink);
+  border: 1px solid var(--ink-soft, #444);
+  background: var(--paper, #181818);
+  color: var(--ink, #eee);
   font-family: var(--font-body);
   font-size: 0.82rem;
   cursor: pointer;
@@ -44,8 +46,8 @@
 }
 
 .event-dashboard__btn--primary {
-  background: var(--accent);
-  color: var(--body-color);
+  background: var(--body-color, #f5c518);
+  color: var(--chassis-color-dark, #000);
   border-color: transparent;
 }
 
@@ -56,19 +58,20 @@
 
 .event-dashboard__zip-progress {
   font-size: 0.8rem;
-  color: var(--ink-soft);
-  background: #f0ede0;
+  color: var(--ink-soft, #999);
+  background: var(--paper, #181818);
   padding: 0.5rem 0.8rem;
   border-radius: 6px;
   margin-bottom: 1rem;
+  border: 1px solid var(--ink-soft, #444);
 }
 
 .event-dashboard__settings {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  background: #fff;
-  border: 1px solid #e0dccc;
+  background: var(--paper, #181818);
+  border: 1px solid var(--ink-soft, #444);
   border-radius: 10px;
   padding: 1.2rem;
   margin-bottom: 1.5rem;
@@ -79,14 +82,17 @@
   flex-direction: column;
   gap: 0.3rem;
   font-size: 0.82rem;
+  color: var(--ink, #eee);
 }
 
 .event-dashboard__settings input,
 .event-dashboard__settings select {
   padding: 0.5rem 0.6rem;
   border-radius: 6px;
-  border: 1px solid var(--ink-soft);
+  border: 1px solid var(--ink-soft, #444);
   font-size: 0.88rem;
+  background: var(--paper, #101010);
+  color: var(--ink, #eee);
 }
 
 .event-dashboard__checkbox {
@@ -114,7 +120,7 @@
 
 .event-dashboard__note {
   font-size: 0.72rem;
-  color: var(--ink-soft);
+  color: var(--ink-soft, #999);
   margin: 0;
 }
 
@@ -133,6 +139,7 @@
 .event-dashboard__guest-header h3 {
   font-size: 0.95rem;
   margin: 0;
+  color: var(--ink, #eee);
 }
 
 .event-dashboard__guest-actions {
@@ -144,7 +151,7 @@
 .event-dashboard__link-btn {
   background: none;
   border: none;
-  color: var(--ink);
+  color: var(--ink, #eee);
   text-decoration: underline;
   font-size: 0.75rem;
   cursor: pointer;
@@ -152,7 +159,7 @@
 }
 
 .event-dashboard__link-btn--danger {
-  color: #c0392b;
+  color: #ff4444;
 }
 
 .event-dashboard__link-btn:disabled {
