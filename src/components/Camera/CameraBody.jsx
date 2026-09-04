@@ -149,16 +149,18 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
 
       <div className="camera-body__label">
         <div className="camera-body__brand">
-          {customTheme?.elements?.brandName?.text && (
-            <span className="camera-body__brand-name" style={{ color: customTheme.colors?.accent || '#e0e0e0' }}>
-              {customTheme.elements.brandName.text}
-            </span>
-          )}
-          {customTheme?.elements?.brandTagline?.text && (
-            <span className="camera-body__brand-tagline" style={{ color: customTheme.colors?.inkSoft || '#a0a0a0' }}>
-              {customTheme.elements.brandTagline.text}
-            </span>
-          )}
+          <span
+            className="camera-body__brand-name"
+            style={customTheme?.colors?.accent ? { color: customTheme.colors.accent } : undefined}
+          >
+            {customTheme?.elements?.brandName?.text || "Toom"}
+          </span>
+          <span
+            className="camera-body__brand-tagline"
+            style={customTheme?.colors?.inkSoft ? { color: customTheme.colors.inkSoft } : undefined}
+          >
+            {customTheme?.elements?.brandTagline?.text || "We'll see tomorrow"}
+          </span>
         </div>
         <InstructionSteps />
       </div>
