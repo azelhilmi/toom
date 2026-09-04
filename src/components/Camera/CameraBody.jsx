@@ -124,6 +124,12 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
             { position: { x: 80, y: 10 }, size: 8 }
           )}
           {renderElement(
+            'flashButton',
+            FlashButton,
+            { active: flashOn, torchSupported, onToggle: () => setFlashOn((v) => !v) },
+            { position: { x: 63, y: 10 }, size: 7 }
+          )}
+          {renderElement(
             'filmWheel', 
             FilmWheel, 
             { armed, disabled: outOfFilm, onArmed: () => setArmed(true) },
@@ -180,13 +186,6 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
               'aria-label': 'Déclencher'
             },
             { position: { x: 50, y: 85 }, size: 18 }
-          )}
-
-          {renderElement(
-            'flashButton',
-            FlashButton,
-            { active: flashOn, torchSupported, onToggle: () => setFlashOn((v) => !v) },
-            { position: { x: 80, y: 15 }, size: 10 }
           )}
         </div>
 

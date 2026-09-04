@@ -137,12 +137,6 @@
   border: 2px solid rgba(255, 255, 255, 0.25);
 }
 
-.camera-body__shutter-row .flash-button {
-  position: absolute;
-  right: calc(50% - 100px);
-  top: -8px;
-}
-
 /* Orientation paysage : on garde exactement la même disposition
    verticale qu'en portrait (viseur centré, bandeau, déclencheur) — elle
    s'étire simplement sur toute la largeur disponible au lieu d'être
