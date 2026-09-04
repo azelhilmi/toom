@@ -123,19 +123,19 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
             'poseCounter', 
             PoseCounter, 
             { remaining: Math.max(shotsRemaining, 0), total: shotsAllowed },
-            { position: { x: 80, y: 10 }, size: 20 }
+            { position: { x: 9, y: 7 }, size: 20 }
           )}
           {renderElement(
             'flashButton',
             FlashButton,
             { active: flashOn, torchSupported, onToggle: () => setFlashOn((v) => !v) },
-            { position: { x: 63, y: 10 }, size: 20 }
+            { position: { x: 21, y: 7 }, size: 20 }
           )}
           {renderElement(
             'filmWheel', 
             FilmWheel, 
             { armed, disabled: outOfFilm, onArmed: () => setArmed(true) },
-            { position: { x: 20, y: 10 }, size: 20 }
+            { position: { x: 88, y: 5 }, size: 20 }
           )}
         </div>
 

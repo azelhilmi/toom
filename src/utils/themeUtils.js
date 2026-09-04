@@ -40,30 +40,30 @@ export const DEFAULT_ELEMENTS = {
     label: 'Flash',
     type: 'button',
     icon: '⚡',
-    position: { x: 63, y: 10 },
+    position: { x: 21, y: 7 },
     size: 20,
     zIndex: 10,
-    landscape: { x: 63, y: 10, size: 20 }
+    landscape: { x: 21, y: 7, size: 20 }
   },
   filmWheel: {
     id: 'filmWheel',
     label: 'Molette',
     type: 'dial',
     icon: '🎞️',
-    position: { x: 20, y: 10 },
+    position: { x: 88, y: 5 },
     size: 20,
     zIndex: 10,
-    landscape: { x: 20, y: 10, size: 20 }
+    landscape: { x: 88, y: 5, size: 20 }
   },
   poseCounter: {
     id: 'poseCounter',
     label: 'Compteur',
     type: 'text',
     icon: '🔢',
-    position: { x: 80, y: 10 },
+    position: { x: 9, y: 7 },
     size: 20,
     zIndex: 10,
-    landscape: { x: 80, y: 10, size: 20 }
+    landscape: { x: 9, y: 7, size: 20 }
   },
   brandName: {
     id: 'brandName',
