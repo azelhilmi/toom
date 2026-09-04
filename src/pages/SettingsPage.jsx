@@ -30,7 +30,7 @@ export default function SettingsPage() {
       const optimized = await imageToOptimizedBase64(file, 1200, 0.85);
       await saveCustomBackground(user.uid, optimized);
       setCustomSkin(optimized);
-    } catch {
+    } catch (err) {
       console.error("Erreur upload skin:", err);
       setUploadError(err?.message || "Échec du traitement de l'image.");
     } finally {

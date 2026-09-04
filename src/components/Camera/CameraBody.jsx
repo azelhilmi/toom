@@ -90,6 +90,18 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
         src={customSkin || layout.skin}
         alt=""
         draggable={false}
+        style={
+          customSkin
+            ? {
+                WebkitMaskImage: `url(${layout.mask})`,
+                maskImage: `url(${layout.mask})`,
+                WebkitMaskSize: "100% 100%",
+                maskSize: "100% 100%",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+              }
+            : undefined
+        }
       />
 
       {/* Couche 3 : zones fonctionnelles transparentes, superposées

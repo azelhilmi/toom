@@ -15,7 +15,7 @@ export default function HamburgerMenu() {
     <div className="hamburger-menu">
       <button
         type="button"
-        className="hamburger-menu__button"
+        className={`hamburger-menu__button ${open ? "hamburger-menu__button--open" : ""}`}
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
         aria-expanded={open}

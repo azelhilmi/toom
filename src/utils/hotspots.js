@@ -19,30 +19,36 @@
 export const HOTSPOTS = {
   landscape: {
     skin: "/skins/default-horizontal.webp",
+    mask: "/skins/mask-horizontal.webp",
     wheelAxis: "horizontal", // glissé gauche→droite
     viewfinder: { x: 47.6, y: 10.4, w: 7.7, h: 13 },
     poseCounter: { x: 75.4, y: 65.5, w: 5.7, h: 7.5 },
     flashButton: { x: 71, y: 12.3, w: 9.3, h: 9.3 },
-    shutter: { x: 49.7, y: 75.8, w: 16, h: 16 },
-    filmWheel: { x: 91, y: 11, w: 13, h: 9 },
+    // Zones de clic élargies par rapport au dessin réel du bouton (plus
+    // facile à viser) — le rendu visuel du cercle reste fixe (voir
+    // FlashButton/CameraBody.css, tailles en vmin), seule la zone
+    // cliquable/glissable grandit.
+    shutter: { x: 49.7, y: 75.8, w: 22, h: 22 },
+    filmWheel: { x: 91, y: 11, w: 20, h: 14 },
     // Zone vide entre la grip du haut (viseur/flash/molette, finit vers
     // 17%) et la zone déclencheur/poses du bas (débute vers 62%) —
-    // marge de sécurité d'au moins 5% de chaque côté vérifiée contre
-    // tous les hotspots ci-dessus.
-    instructionsZone: { x: 50, y: 39.5, w: 88, h: 30 },
+    // marge de sécurité d'au moins 5% vérifiée contre tous les hotspots
+    // ci-dessus, y compris après leur agrandissement.
+    instructionsZone: { x: 50, y: 40, w: 88, h: 31 },
   },
   portrait: {
     skin: "/skins/default-vertical.webp",
+    mask: "/skins/mask-vertical.webp",
     wheelAxis: "vertical", // glissé haut→bas
     viewfinder: { x: 49.9, y: 7.6, w: 14.1, h: 6.1 },
     poseCounter: { x: 85.4, y: 82.9, w: 9.4, h: 3.7 },
     flashButton: { x: 84.6, y: 26.2, w: 14, h: 14 },
-    shutter: { x: 48.9, y: 73.3, w: 18, h: 18 },
-    filmWheel: { x: 89.9, y: 8.9, w: 6, h: 11 },
+    shutter: { x: 48.9, y: 73.3, w: 22, h: 22 },
+    filmWheel: { x: 89.9, y: 8.9, w: 10, h: 18 },
     // Le flash occupe déjà toute la colonne droite jusqu'à y≈33% ici —
     // zone d'instructions repoussée en dessous, avant le déclencheur
-    // (qui commence vers 64%).
-    instructionsZone: { x: 50, y: 48.5, w: 88, h: 20 },
+    // (qui commence désormais vers 62% après agrandissement).
+    instructionsZone: { x: 50, y: 48, w: 86, h: 18 },
   },
 };
 
