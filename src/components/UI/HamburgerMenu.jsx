@@ -3,9 +3,36 @@ import { Link } from "react-router-dom";
 import "./HamburgerMenu.css";
 
 const LINKS = [
-  { to: "/event", label: "Événement" },
-  { to: "/gallery", label: "Galerie" },
-  { to: "/settings", label: "Réglages" },
+  {
+    to: "/event",
+    label: "Événement",
+    desc: "Créer ou rejoindre une pellicule partagée",
+    icon: (
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path fill="currentColor" d="M7 2v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2V2h-2v2H9V2H7zM5 9h14v11H5V9zm7 2l1.2 2.4 2.6.4-1.9 1.9.5 2.6L12 17l-2.4 1.3.5-2.6-1.9-1.9 2.6-.4L12 11z" />
+      </svg>
+    ),
+  },
+  {
+    to: "/gallery",
+    label: "Galerie",
+    desc: "Retrouver tes photos développées",
+    icon: (
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path fill="currentColor" d="M4 5a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2H4zm0 2h16v10H4V7zm3 1.5A1.5 1.5 0 108.5 10 1.5 1.5 0 007 8.5zM6 16l3.5-4.5 2.5 3L15 10l3 6H6z" />
+      </svg>
+    ),
+  },
+  {
+    to: "/settings",
+    label: "Réglages",
+    desc: "Personnaliser l'habillage de l'appareil",
+    icon: (
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path fill="currentColor" d="M19.4 13a7.4 7.4 0 000-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 00-1.7-1L15 3h-6l-.3 2.5a7.6 7.6 0 00-1.7 1l-2.4-1-2 3.4L4.6 11a7.4 7.4 0 000 2l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 001.7 1L9 21h6l.3-2.5a7.6 7.6 0 001.7-1l2.4 1 2-3.4L19.4 13zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z" />
+      </svg>
+    ),
+  },
 ];
 
 export default function HamburgerMenu() {
@@ -26,17 +53,33 @@ export default function HamburgerMenu() {
       </button>
 
       {open && (
-        <>
-          <div className="hamburger-menu__backdrop" onClick={() => setOpen(false)} />
-          <div className="hamburger-menu__panel">
-            <img src="/brand/icon-round-small.webp" alt="Toom" className="hamburger-menu__logo" />
-            {LINKS.map((link) => (
-              <Link key={link.to} to={link.to} className="hamburger-menu__link" onClick={() => setOpen(false)}>
-                {link.label}
-              </Link>
-            ))}
+        <div className="hamburger-modal" onClick={() => setOpen(false)}>
+          <div className="hamburger-modal__sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="hamburger-modal__header">
+              <img src="/brand/icon-round.webp" alt="Toom" className="hamburger-modal__logo" />
+              <button
+                type="button"
+                className="hamburger-modal__close"
+                onClick={() => setOpen(false)}
+                aria-label="Fermer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <nav className="hamburger-modal__links">
+              {LINKS.map((link) => (
+                <Link key={link.to} to={link.to} className="hamburger-modal__link" onClick={() => setOpen(false)}>
+                  <span className="hamburger-modal__link-icon">{link.icon}</span>
+                  <span className="hamburger-modal__link-text">
+                    <span className="hamburger-modal__link-label">{link.label}</span>
+                    <span className="hamburger-modal__link-desc">{link.desc}</span>
+                  </span>
+                </Link>
+              ))}
+            </nav>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

@@ -30,15 +30,16 @@ export async function captureFramePrintQuality(videoEl) {
   canvas.height = height;
   const ctx = canvas.getContext("2d");
 
-  // Rendu "pellicule bon marché des années 2000" : teinte chaude légèrement
-  // décalée vers le jaune/orangé, noirs remontés (aspect délavé), contraste
-  // et saturation modérés. Baked dans l'image (pas un filtre CSS d'aperçu) :
-  // la photo garde ce rendu même une fois téléchargée/imprimée.
-  ctx.filter = "sepia(0.22) saturate(1.35) contrast(1.1) brightness(1.03) hue-rotate(-8deg)";
+  // Rendu "pellicule bon marché des années 90-2000" : teinte chaude
+  // orangée plus marquée, contraste et saturation punchy typiques du
+  // développement en 1h en drugstore, légère douceur d'optique bas de
+  // gamme. Baked dans l'image (pas un filtre CSS d'aperçu) : la photo
+  // garde ce rendu même une fois téléchargée/imprimée.
+  ctx.filter = "sepia(0.32) saturate(1.5) contrast(1.16) brightness(1.05) hue-rotate(-12deg) blur(0.4px)";
   ctx.drawImage(videoEl, 0, 0, width, height);
 
   applyVignette(ctx, width, height);
-  applyGrain(ctx, width, height, 7); // intensité réduite : à cette résolution, le bruit pèse plus lourd une fois compressé
+  applyGrain(ctx, width, height, 12); // grain plus marqué, franchement visible comme sur une vraie pellicule
 
   const webpBlob = await canvasToBlob(canvas, "image/webp", IMAGE_QUALITY);
   if (webpBlob && webpBlob.type === "image/webp") return webpBlob;

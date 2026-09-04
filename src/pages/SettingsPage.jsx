@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { saveCustomBackground, deleteCustomBackground } from "../firebase/firestore";
 import { imageToOptimizedBase64 } from "../utils/imageCompression";
 import InstallAppCard from "../components/UI/InstallAppCard";
+import ImageCropModal from "../components/UI/ImageCropModal";
 import "./SettingsPage.css";
 
 export default function SettingsPage() {
@@ -12,22 +13,30 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [pendingFile, setPendingFile] = useState(null);
   const fileInputRef = useRef(null);
 
-  async function handleUpload(e) {
+  function handleFileSelected(e) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
       setUploadError("Sélectionne une image.");
       return;
     }
+    setUploadError(null);
+    // Ouvre la modale de recadrage/rotation avant tout traitement.
+    setPendingFile(file);
+  }
+
+  async function handleCropConfirm(croppedBlob) {
+    setPendingFile(null);
     setIsUploading(true);
     setUploadError(null);
     try {
       // Compression automatique à la volée, quelle que soit la taille
       // d'origine — une photo de téléphone (souvent plusieurs Mo) est
       // toujours acceptée, jamais rejetée pour être "trop grosse".
-      const optimized = await imageToOptimizedBase64(file, 1200, 0.85);
+      const optimized = await imageToOptimizedBase64(croppedBlob, 1200, 0.85);
       await saveCustomBackground(user.uid, optimized);
       setCustomSkin(optimized);
     } catch (err) {
@@ -47,6 +56,17 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page">
+      {pendingFile && (
+        <ImageCropModal
+          file={pendingFile}
+          onConfirm={handleCropConfirm}
+          onCancel={() => {
+            setPendingFile(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+          }}
+        />
+      )}
+
       <header className="settings-page__header">
         <div>
           <img src="/brand/icon-round-small.webp" alt="" className="page-header-logo" />
@@ -67,14 +87,15 @@ export default function SettingsPage() {
           Remplace l'habillage jaune par défaut par une image de ton choix —
           elle s'adapte automatiquement à ton écran, en portrait comme en
           paysage. N'importe quelle photo convient, elle est compressée
-          automatiquement.
+          automatiquement. Tu pourras la recadrer et la faire pivoter avant
+          de valider.
         </p>
 
         <div className="settings-page__upload">
           <input
             type="file"
             ref={fileInputRef}
-            onChange={handleUpload}
+            onChange={handleFileSelected}
             accept="image/*"
             disabled={isUploading}
             className="settings-page__file-input"

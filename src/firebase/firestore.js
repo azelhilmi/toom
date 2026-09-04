@@ -292,27 +292,64 @@ export function listenEventPhotos(eventId, callback) {
 // ---------- Personnalisation utilisateur ----------
 
 const CUSTOMIZATION_COLLECTION = "userCustomizations";
+// Taille max d'un morceau (marge sous la limite Firestore de 1 Mo). Le
+// fond personnalisé, même compressé, peut dépasser 1 Mo une fois encodé
+// en base64 — même stratégie de découpage que pour les photos.
+const CUSTOMIZATION_CHUNK_SIZE = 650_000;
 
 export async function saveCustomBackground(uid, backgroundBase64) {
-  await setDoc(
+  const chunkCount = Math.ceil(backgroundBase64.length / CUSTOMIZATION_CHUNK_SIZE);
+  const batch = writeBatch(db);
+  batch.set(
     doc(db, CUSTOMIZATION_COLLECTION, uid),
-    { background: backgroundBase64, updatedAt: serverTimestamp() },
+    { chunkCount, updatedAt: serverTimestamp() },
     { merge: true }
   );
+  for (let i = 0; i < chunkCount; i++) {
+    batch.set(
+      doc(db, CUSTOMIZATION_COLLECTION, uid, "chunks", String(i)),
+      { data: backgroundBase64.slice(i * CUSTOMIZATION_CHUNK_SIZE, (i + 1) * CUSTOMIZATION_CHUNK_SIZE) }
+    );
+  }
+  await batch.commit();
+}
+
+async function loadCustomBackgroundChunks(uid, chunkCount) {
+  if (!chunkCount) return null;
+  const chunkSnaps = await Promise.all(
+    Array.from({ length: chunkCount }, (_, i) => getDoc(doc(db, CUSTOMIZATION_COLLECTION, uid, "chunks", String(i))))
+  );
+  return chunkSnaps.map((snap) => snap.data()?.data || "").join("");
 }
 
 export async function getCustomBackground(uid) {
   const snap = await getDoc(doc(db, CUSTOMIZATION_COLLECTION, uid));
-  return snap.exists() ? snap.data().background || null : null;
+  if (!snap.exists()) return null;
+  return loadCustomBackgroundChunks(uid, snap.data().chunkCount);
 }
 
+/**
+ * Écoute le manifeste (léger) en temps réel ; recharge les morceaux
+ * (plus lourds, pas en temps réel) uniquement quand le manifeste change.
+ */
 export function listenToCustomization(uid, callback) {
-  return onSnapshot(
-    doc(db, CUSTOMIZATION_COLLECTION, uid),
-    (snap) => callback(snap.exists() ? snap.data() : null)
-  );
+  return onSnapshot(doc(db, CUSTOMIZATION_COLLECTION, uid), async (snap) => {
+    if (!snap.exists() || !snap.data().chunkCount) {
+      callback(null);
+      return;
+    }
+    const background = await loadCustomBackgroundChunks(uid, snap.data().chunkCount);
+    callback({ background });
+  });
 }
 
 export async function deleteCustomBackground(uid) {
-  await updateDoc(doc(db, CUSTOMIZATION_COLLECTION, uid), { background: null });
+  const snap = await getDoc(doc(db, CUSTOMIZATION_COLLECTION, uid));
+  const chunkCount = snap.exists() ? snap.data().chunkCount || 0 : 0;
+  const batch = writeBatch(db);
+  batch.set(doc(db, CUSTOMIZATION_COLLECTION, uid), { chunkCount: 0 }, { merge: true });
+  for (let i = 0; i < chunkCount; i++) {
+    batch.delete(doc(db, CUSTOMIZATION_COLLECTION, uid, "chunks", String(i)));
+  }
+  await batch.commit();
 }

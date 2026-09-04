@@ -101,6 +101,13 @@ service cloud.firestore {
     match /userCustomizations/{uid} {
       allow read: if isSignedIn();
       allow write: if isSignedIn() && request.auth.uid == uid;
+
+      // Morceaux du fond personnalisé (même limite de 1 Mo/document que
+      // pour les photos — voir photoDataChunks ci-dessus).
+      match /chunks/{chunkId} {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn() && request.auth.uid == uid;
+      }
     }
 
     match /customThemes/{uid} {
