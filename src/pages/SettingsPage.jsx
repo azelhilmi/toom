@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { AVAILABLE_THEMES, useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
-import { saveCustomBackground, deleteCustomBackground } from "../firebase/firestore";
+import { saveCustomBackground, deleteCustomBackground, loadCustomTheme, saveCustomTheme } from "../firebase/firestore";
 import { imageToOptimizedBase64 } from "../utils/imageCompression";
+import ThemeCustomizer from "../components/ThemeCustomizer/ThemeCustomizer";
 import "./SettingsPage.css";
 
 export default function SettingsPage() {
@@ -11,6 +12,7 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [showCustomizer, setShowCustomizer] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleBackgroundUpload = async (e) => {
@@ -50,6 +52,28 @@ export default function SettingsPage() {
     setCustomBackground(null);
   };
 
+  const handleSaveTheme = useCallback(async (themeData) => {
+    if (!user?.uid) return;
+    await saveCustomTheme(user.uid, themeData);
+  }, [user?.uid]);
+
+  const handleOpenCustomizer = () => {
+    setShowCustomizer(true);
+  };
+
+  const handleCloseCustomizer = () => {
+    setShowCustomizer(false);
+  };
+
+  if (showCustomizer) {
+    return (
+      <ThemeCustomizer
+        onClose={handleCloseCustomizer}
+        onSave={handleSaveTheme}
+      />
+    );
+  }
+
   return (
     <div className="settings-page">
       <header className="settings-page__header">
@@ -76,6 +100,21 @@ export default function SettingsPage() {
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="settings-page__section">
+        <h2>Personnalisation avancée</h2>
+        <p className="settings-page__hint">
+          Créez un thème 100% personnalisé avec positionnement des éléments,
+          couleurs, textes et effets visuels.
+        </p>
+        <button
+          type="button"
+          className="settings-page__customize-button"
+          onClick={handleOpenCustomizer}
+        >
+          Ouvrir le customisateur de thème
+        </button>
       </section>
 
       <section className="settings-page__section">

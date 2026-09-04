@@ -1,6 +1,7 @@
 import {
   doc, getDoc, getDocs, setDoc, updateDoc, increment, serverTimestamp,
   collection, addDoc, query, where, orderBy, limit, onSnapshot, Timestamp,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "./init";
 import { captureFrameAsBase64 } from "../utils/imageCompression";
@@ -226,11 +227,16 @@ export function listenEventPhotos(eventId, callback) {
   return onSnapshot(q, (snap) => callback(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
 }
 
-// Personnalisation utilisateur
+// ---------- Personnalisation utilisateur ----------
+
 const CUSTOMIZATION_COLLECTION = "userCustomizations";
 
 export async function saveCustomBackground(uid, backgroundBase64) {
-  await setDoc(doc(db, CUSTOMIZATION_COLLECTION, uid), { background: backgroundBase64, updatedAt: serverTimestamp() }, { merge: true });
+  await setDoc(
+    doc(db, CUSTOMIZATION_COLLECTION, uid),
+    { background: backgroundBase64, updatedAt: serverTimestamp() },
+    { merge: true }
+  );
 }
 
 export async function getCustomBackground(uid) {
@@ -239,9 +245,55 @@ export async function getCustomBackground(uid) {
 }
 
 export function listenToCustomization(uid, callback) {
-  return onSnapshot(doc(db, CUSTOMIZATION_COLLECTION, uid), (snap) => callback(snap.exists() ? snap.data() : null));
+  return onSnapshot(
+    doc(db, CUSTOMIZATION_COLLECTION, uid),
+    (snap) => callback(snap.exists() ? snap.data() : null)
+  );
 }
 
 export async function deleteCustomBackground(uid) {
   await updateDoc(doc(db, CUSTOMIZATION_COLLECTION, uid), { background: null });
+}
+
+// Thèmes personnalisés complets
+const CUSTOM_THEMES_COLLECTION = "customThemes";
+
+/**
+ * Sauvegarde un thème personnalisé complet
+ */
+export async function saveCustomTheme(uid, themeData) {
+  await setDoc(
+    doc(db, CUSTOM_THEMES_COLLECTION, uid),
+    {
+      ...themeData,
+      ownerId: uid,
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+}
+
+/**
+ * Charge un thème personnalisé complet
+ */
+export async function loadCustomTheme(uid) {
+  const snap = await getDoc(doc(db, CUSTOM_THEMES_COLLECTION, uid));
+  return snap.exists() ? snap.data() : null;
+}
+
+/**
+ * Écoute les changements d'un thème personnalisé
+ */
+export function listenToCustomTheme(uid, callback) {
+  return onSnapshot(
+    doc(db, CUSTOM_THEMES_COLLECTION, uid),
+    (snap) => callback(snap.exists() ? snap.data() : null)
+  );
+}
+
+/**
+ * Supprime un thème personnalisé
+ */
+export async function deleteCustomTheme(uid) {
+  await deleteDoc(doc(db, CUSTOM_THEMES_COLLECTION, uid));
 }
