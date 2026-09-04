@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { saveCustomBackground, deleteCustomBackground, loadCustomTheme, saveCustomTheme } from "../firebase/firestore";
 import { imageToOptimizedBase64 } from "../utils/imageCompression";
 import ThemeCustomizer from "../components/ThemeCustomizer/ThemeCustomizer";
+import InstallAppCard from "../components/UI/InstallAppCard";
 import "./SettingsPage.css";
 
 export default function SettingsPage() {
@@ -78,6 +79,11 @@ export default function SettingsPage() {
         </div>
         <Link to="/" className="settings-page__back">Appareil</Link>
       </header>
+
+      <section className="settings-page__section">
+        <h2>Installer l'application</h2>
+        <InstallAppCard />
+      </section>
 
       <section className="settings-page__section">
         <h2>Thème</h2>
