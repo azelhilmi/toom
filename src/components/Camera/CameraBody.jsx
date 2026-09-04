@@ -3,7 +3,7 @@ import Viewfinder from "./Viewfinder";
 import FilmWheel from "./FilmWheel";
 import PoseCounter from "./PoseCounter";
 import FlashButton from "./FlashButton";
-import BottomIconNav from "../UI/BottomIconNav";
+import HamburgerMenu from "../UI/HamburgerMenu";
 import InstructionsOverlay from "./InstructionsOverlay";
 import DevelopClock from "./DevelopClock";
 import { useCameraStream } from "../../utils/useCameraStream";
@@ -129,21 +129,22 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
         )}
       </div>
 
-      {/* Retour discret (nombre de poses ne suffit pas toujours à faire
-          comprendre l'état armé/désarmé) + navigation, en surimpression. */}
-      <div className="camera-body__overlay-footer">
-        <p className="camera-body__hint" role="status">
+      <HamburgerMenu />
+
+      {/* Cadre "étiquette" bien visible pour le statut courant (armé,
+          instructions de glissé, retour après capture…). */}
+      <div className="camera-body__status-label">
+        <p className="camera-body__status-text" role="status">
           {outOfFilm
             ? "Pellicule épuisée — regarde l'heure de développement ci-dessus."
             : feedback
             ? feedback
             : armed
-            ? "Prêt. Appuie sur le déclencheur."
+            ? "Prêt ! Appuie sur le déclencheur."
             : layout.wheelAxis === "horizontal"
-            ? "Glisse la molette vers la droite pour remonter le film."
-            : "Glisse la molette vers le bas pour remonter le film."}
+            ? "Glisse la molette vers la droite"
+            : "Glisse la molette vers le bas"}
         </p>
-        <BottomIconNav />
       </div>
     </div>
   );

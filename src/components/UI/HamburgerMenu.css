@@ -1,0 +1,73 @@
+.hamburger-menu {
+  position: absolute;
+  top: max(0.8rem, env(safe-area-inset-top));
+  left: 0.8rem;
+  z-index: 10;
+}
+
+.hamburger-menu__button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hamburger-menu__button span {
+  width: 18px;
+  height: 2px;
+  background: #fff;
+  border-radius: 1px;
+}
+
+.hamburger-menu__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+}
+
+.hamburger-menu__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 0.8rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  min-width: 160px;
+}
+
+.hamburger-menu__logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-bottom: 0.4rem;
+}
+
+.hamburger-menu__link {
+  width: 100%;
+  padding: 0.5rem 0.3rem;
+  font-family: var(--font-body, "Roboto Condensed", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #eee;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.hamburger-menu__link:active {
+  background: rgba(255, 255, 255, 0.08);
+}

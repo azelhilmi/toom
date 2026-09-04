@@ -1,4 +1,3 @@
-import BrandMark from "../UI/BrandMark";
 import "./InstructionsOverlay.css";
 
 export default function InstructionsOverlay({ wheelAxis }) {
@@ -21,10 +20,6 @@ export default function InstructionsOverlay({ wheelAxis }) {
           <strong>⚡</strong> Le petit éclair active le <strong>flash</strong> (intérieur / faible luminosité)
         </li>
       </ol>
-
-      <div className="instructions-overlay__brand">
-        <BrandMark size="small" withTagline={false} />
-      </div>
     </div>
   );
 }
