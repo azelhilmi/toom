@@ -11,6 +11,23 @@
     <meta name="apple-mobile-web-app-title" content="Toom" />
     <meta name="theme-color" content="#101010" />
     <title>Toom · l'appareil jetable qui attend demain</title>
+    <!-- Filtre SVG pour effet fisheye -->
+    <svg style="display: none; position: absolute; width: 0; height: 0;">
+      <defs>
+        <filter id="fisheye-light" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="0.1" result="blur" />
+          <feDisplacementMap in="SourceGraphic" in2="blur" scale="10" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        <filter id="fisheye-medium" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="0.2" result="blur" />
+          <feDisplacementMap in="SourceGraphic" in2="blur" scale="20" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        <filter id="fisheye-strong" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="0.3" result="blur" />
+          <feDisplacementMap in="SourceGraphic" in2="blur" scale="30" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+    </svg>
   </head>
   <body>
     <div id="root"></div>
