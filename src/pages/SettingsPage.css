@@ -85,3 +85,88 @@
   flex-shrink: 0;
   box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3);
 }
+
+/* Upload personnalisé */
+.settings-page__hint {
+  font-family: var(--font-body);
+  color: #777;
+  font-size: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.settings-page__upload {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.settings-page__file-input {
+  display: none;
+}
+
+.settings-page__upload-button {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  background: var(--body-color, #f5c518);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.settings-page__upload-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.settings-page__upload-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-page__remove-button {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  background: #c0392b;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.settings-page__remove-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.settings-page__remove-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-page__error {
+  font-family: var(--font-body);
+  color: #ff4444;
+  font-size: 0.75rem;
+  margin: 0.5rem 0 0;
+}
+
+.settings-page__preview {
+  margin-top: 1rem;
+}
+
+.settings-page__preview-image {
+  width: 100%;
+  max-width: 200px;
+  aspect-ratio: 9 / 16;
+  background-size: cover;
+  background-position: center;
+  background-color: #111;
+  border-radius: 8px;
+  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}

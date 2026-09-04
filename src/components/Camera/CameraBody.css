@@ -7,10 +7,15 @@
   display: flex;
   flex-direction: column;
   background: var(--chassis-color, #000);
-  background-image: var(--chassis-texture, none);
+  background-image: var(--chassis-texture, none), var(--custom-background, none);
+  background-size: auto, cover;
+  background-position: center;
+  background-repeat: repeat, no-repeat;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
   border-radius: 12px;
   border: 3px solid var(--chassis-color-dark, #000);
+  position: relative;
+  overflow: hidden;
 }
 
 .camera-body__top {

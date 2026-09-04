@@ -1,9 +1,54 @@
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AVAILABLE_THEMES, useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
+import { saveCustomBackground, deleteCustomBackground } from "../firebase/firestore";
+import { imageToOptimizedBase64 } from "../utils/imageCompression";
 import "./SettingsPage.css";
 
 export default function SettingsPage() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, customBackground, setCustomBackground } = useTheme();
+  const { user } = useAuth();
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleBackgroundUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Veuillez sélectionner une image');
+      return;
+    }
+
+    if (file.size > 500 * 1024) {
+      setUploadError('L\'image doit faire moins de 500 Ko');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const optimizedBase64 = await imageToOptimizedBase64(file, 420, 0.75);
+      await saveCustomBackground(user.uid, optimizedBase64);
+      setCustomBackground(optimizedBase64);
+    } catch (err) {
+      setUploadError('Échec du traitement de l\'image');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveBackground = async () => {
+    if (!user?.uid) return;
+    await deleteCustomBackground(user.uid);
+    setCustomBackground(null);
+  };
 
   return (
     <div className="settings-page">
@@ -31,6 +76,53 @@ export default function SettingsPage() {
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="settings-page__section">
+        <h2>Arrière-plan personnalisé</h2>
+        <p className="settings-page__hint">
+          Upload une image pour le boîtier de ton appareil (max 500 Ko).
+          Les boutons et le viseur resteront par-dessus.
+        </p>
+        
+        <div className="settings-page__upload">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleBackgroundUpload}
+            accept="image/jpeg,image/png,image/webp"
+            disabled={isUploading}
+            className="settings-page__file-input"
+            id="background-upload"
+          />
+          <label htmlFor="background-upload" className="settings-page__upload-button">
+            {isUploading ? 'Traitement...' : 'Choisir une image'}
+          </label>
+          
+          {customBackground && (
+            <button
+              type="button"
+              onClick={handleRemoveBackground}
+              className="settings-page__remove-button"
+              disabled={isUploading}
+            >
+              Supprimer
+            </button>
+          )}
+        </div>
+        
+        {uploadError && (
+          <p className="settings-page__error">{uploadError}</p>
+        )}
+        
+        {customBackground && (
+          <div className="settings-page__preview">
+            <div
+              className="settings-page__preview-image"
+              style={{ backgroundImage: `url(${customBackground})` }}
+            />
+          </div>
+        )}
       </section>
     </div>
   );

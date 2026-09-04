@@ -225,3 +225,23 @@ export function listenEventPhotos(eventId, callback) {
   const q = query(collection(db, "photos"), where("eventId", "==", eventId), orderBy("takenAt", "desc"));
   return onSnapshot(q, (snap) => callback(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
 }
+
+// Personnalisation utilisateur
+const CUSTOMIZATION_COLLECTION = "userCustomizations";
+
+export async function saveCustomBackground(uid, backgroundBase64) {
+  await setDoc(doc(db, CUSTOMIZATION_COLLECTION, uid), { background: backgroundBase64, updatedAt: serverTimestamp() }, { merge: true });
+}
+
+export async function getCustomBackground(uid) {
+  const snap = await getDoc(doc(db, CUSTOMIZATION_COLLECTION, uid));
+  return snap.exists() ? snap.data().background || null : null;
+}
+
+export function listenToCustomization(uid, callback) {
+  return onSnapshot(doc(db, CUSTOMIZATION_COLLECTION, uid), (snap) => callback(snap.exists() ? snap.data() : null));
+}
+
+export async function deleteCustomBackground(uid) {
+  await updateDoc(doc(db, CUSTOMIZATION_COLLECTION, uid), { background: null });
+}
