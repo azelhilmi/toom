@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Viewfinder from "./Viewfinder";
 import FilmWheel from "./FilmWheel";
 import PoseCounter from "./PoseCounter";
@@ -7,10 +7,13 @@ import InstructionSteps from "./InstructionSteps";
 import BottomIconNav from "../UI/BottomIconNav";
 import { useCameraStream } from "../../utils/useCameraStream";
 import { requestAppFullscreen } from "../../utils/fullscreen";
+import { useTheme } from "../../context/ThemeContext";
+import { getFisheyeFilter } from "../../utils/themeUtils";
 import "./CameraBody.css";
 
 export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) {
   const { videoRef, error, ready, torchSupported, applyTorch } = useCameraStream();
+  const { customTheme } = useTheme();
   const [armed, setArmed] = useState(false);
   const [flashOn, setFlashOn] = useState(false);
   const [flashPulse, setFlashPulse] = useState(false);
@@ -19,6 +22,30 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
   const fullscreenRequested = useRef(false);
 
   const outOfFilm = shotsRemaining <= 0;
+
+  // Appliquer les positions des éléments depuis le thème custom
+  const getElementPosition = (elementId, defaultPosition) => {
+    if (!customTheme?.elements?.[elementId]) {
+      return defaultPosition;
+    }
+    const element = customTheme.elements[elementId];
+    return {
+      position: element.position || defaultPosition.position,
+      size: element.size || defaultPosition.size
+    };
+  };
+
+  // Styles dynamiques pour les éléments
+  const cameraBodyStyle = {
+    background: customTheme?.background ? `url(${customTheme.background}) center/cover` : undefined
+  };
+
+  // Style pour le viseur avec effet fisheye personnalisé
+  const viewfinderStyle = {
+    filter: customTheme?.effects?.fisheye 
+      ? getFisheyeFilter(customTheme.effects.fisheyeIntensity) 
+      : 'blur(1.5px) url(#fisheye-medium)'
+  };
 
   function tryEnterFullscreen() {
     if (fullscreenRequested.current) return;
@@ -58,23 +85,74 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
     }
   }
 
+  // Rendu des éléments avec positions personnalisées
+  const renderElement = (elementId, Component, props = {}, defaultPosition) => {
+    const element = customTheme?.elements?.[elementId];
+    const config = getElementPosition(elementId, defaultPosition);
+    
+    // Calculer la position absolue en % du conteneur
+    const containerWidth = 420; // Largeur max du camera-body
+    const containerHeight = 800; // Hauteur estimée
+    
+    const posX = (config.position.x / 100) * containerWidth;
+    const posY = (config.position.y / 100) * containerHeight;
+    const size = (config.size / 100) * Math.min(containerWidth, containerHeight);
+    
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          left: `${posX}px`,
+          top: `${posY}px`,
+          transform: 'translate(-50%, -50%)',
+          zIndex: element?.zIndex || props.zIndex || 0
+        }}
+      >
+        <Component {...props} />
+      </div>
+    );
+  };
+
   return (
-    <div className="camera-body" onPointerDownCapture={tryEnterFullscreen}>
+    <div className="camera-body" onPointerDownCapture={tryEnterFullscreen} style={cameraBodyStyle}>
       <div className="camera-body__top">
         <div className="camera-body__top-row">
-          <PoseCounter remaining={Math.max(shotsRemaining, 0)} total={shotsAllowed} />
-          <FilmWheel armed={armed} disabled={outOfFilm} onArmed={() => setArmed(true)} />
+          {renderElement(
+            'poseCounter', 
+            PoseCounter, 
+            { remaining: Math.max(shotsRemaining, 0), total: shotsAllowed },
+            { position: { x: 80, y: 10 }, size: 8 }
+          )}
+          {renderElement(
+            'filmWheel', 
+            FilmWheel, 
+            { armed, disabled: outOfFilm, onArmed: () => setArmed(true) },
+            { position: { x: 20, y: 10 }, size: 15 }
+          )}
         </div>
 
         <div className="camera-body__viewfinder-wrap">
-          <Viewfinder videoRef={videoRef} error={error} flashPulse={flashPulse} />
+          <Viewfinder 
+            videoRef={videoRef} 
+            error={error} 
+            flashPulse={flashPulse}
+            style={viewfinderStyle}
+          />
         </div>
       </div>
 
       <div className="camera-body__label">
         <div className="camera-body__brand">
-          <span className="camera-body__brand-name">Toom</span>
-          <span className="camera-body__brand-tagline">We'll see tomorrow</span>
+          {customTheme?.elements?.brandName?.text && (
+            <span className="camera-body__brand-name" style={{ color: customTheme.colors?.accent || '#e0e0e0' }}>
+              {customTheme.elements.brandName.text}
+            </span>
+          )}
+          {customTheme?.elements?.brandTagline?.text && (
+            <span className="camera-body__brand-tagline" style={{ color: customTheme.colors?.inkSoft || '#a0a0a0' }}>
+              {customTheme.elements.brandTagline.text}
+            </span>
+          )}
         </div>
         <InstructionSteps />
       </div>
@@ -91,17 +169,25 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
         </p>
 
         <div className="camera-body__shutter-row">
-          <button
-            type="button"
-            className="camera-body__shutter"
-            onClick={handleShutter}
-            disabled={!armed || capturing || outOfFilm || !ready}
-            aria-label="Déclencher"
-          >
-            <span className="camera-body__shutter-ring" />
-          </button>
+          {renderElement(
+            'shutter',
+            'button',
+            {
+              type: 'button',
+              className: 'camera-body__shutter',
+              onClick: handleShutter,
+              disabled: !armed || capturing || outOfFilm || !ready,
+              'aria-label': 'Déclencher'
+            },
+            { position: { x: 50, y: 85 }, size: 18 }
+          )}
 
-          <FlashButton active={flashOn} torchSupported={torchSupported} onToggle={() => setFlashOn((v) => !v)} />
+          {renderElement(
+            'flashButton',
+            FlashButton,
+            { active: flashOn, torchSupported, onToggle: () => setFlashOn((v) => !v) },
+            { position: { x: 80, y: 15 }, size: 10 }
+          )}
         </div>
 
         <BottomIconNav />
