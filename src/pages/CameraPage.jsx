@@ -2,31 +2,29 @@ import { useCallback, useEffect, useState } from "react";
 import CameraBody from "../components/Camera/CameraBody";
 import DevelopingScreen from "../components/Camera/DevelopingScreen";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
 import { getOrCreateActiveRoll, listenToRoll, takePhoto } from "../firebase/firestore";
 
 export default function CameraPage() {
   const { user, ready } = useAuth();
-  const { theme } = useTheme();
   const [rollId, setRollId] = useState(null);
   const [roll, setRoll] = useState(null);
 
   const loadActiveRoll = useCallback(() => {
     if (!user) return () => {};
     let unsub = () => {};
-    getOrCreateActiveRoll(user.uid, theme).then((id) => {
+    getOrCreateActiveRoll(user.uid).then((id) => {
       setRollId(id);
       unsub = listenToRoll(id, setRoll);
     });
     return () => unsub();
-  }, [user, theme]);
+  }, [user]);
 
   useEffect(() => {
     if (!ready || !user) return;
     const cleanup = loadActiveRoll();
     return cleanup;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, user, theme]);
+  }, [ready, user]);
 
   if (!ready || !roll) {
     return <p className="page-loading">Chargement de la pellicule…</p>;

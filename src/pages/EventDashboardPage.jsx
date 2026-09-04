@@ -7,7 +7,6 @@ import {
   syncGuestShotsAllowed, resetGuestRoll,
 } from "../firebase/firestore";
 import { downloadPhotosAsZip } from "../utils/downloadAlbum";
-import { AVAILABLE_THEMES } from "../context/ThemeContext";
 import "./EventDashboardPage.css";
 
 function toDatetimeLocalValue(timestamp) {
@@ -40,11 +39,6 @@ export default function EventDashboardPage() {
       setForm({
         shotsPerGuest: e.shotsPerGuest,
         revealDate: toDatetimeLocalValue(e.revealAt),
-        theme: e.theme,
-        customColors: e.customColors || {
-          bodyColor: "#f5c518", bodyColorDark: "#d9a800", bodyShadow: "#8a6a00",
-          accent: "#1a1a1a", accentSoft: "#3a3a3a",
-        },
       });
     });
     return () => {
@@ -70,8 +64,6 @@ export default function EventDashboardPage() {
     await updateEvent(eventId, {
       shotsPerGuest: Number(form.shotsPerGuest),
       revealDate: form.revealDate,
-      theme: form.theme,
-      customColors: form.theme === "custom" ? form.customColors : null,
     });
     if (applyToExisting) {
       await syncGuestShotsAllowed(eventId, Number(form.shotsPerGuest));
@@ -180,39 +172,8 @@ export default function EventDashboardPage() {
             />
           </label>
 
-          <label>
-            Thème
-            <select value={form.theme} onChange={(e) => setForm((f) => ({ ...f, theme: e.target.value }))}>
-              {AVAILABLE_THEMES.map((t) => (
-                <option key={t.id} value={t.id}>{t.label}</option>
-              ))}
-            </select>
-          </label>
-
-          {form.theme === "custom" && (
-            <div className="event-dashboard__colors">
-              {[
-                ["bodyColor", "Couleur principale"],
-                ["bodyColorDark", "Principale (foncé)"],
-                ["accent", "Texte / accent"],
-                ["bodyShadow", "Ombre du boîtier"],
-              ].map(([key, label]) => (
-                <label key={key} className="event-dashboard__color-field">
-                  {label}
-                  <input
-                    type="color"
-                    value={form.customColors[key]}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, customColors: { ...f.customColors, [key]: e.target.value } }))
-                    }
-                  />
-                </label>
-              ))}
-            </div>
-          )}
-
           <p className="event-dashboard__note">
-            Le nouveau thème ne s'applique qu'à l'ouverture de l'app par chaque invité — il ne modifie pas leurs photos déjà prises.
+            L'habillage visuel se règle individuellement par chaque invité, dans ses propres Réglages.
           </p>
 
           <button type="submit" className="event-dashboard__btn event-dashboard__btn--primary" disabled={saving}>

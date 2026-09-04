@@ -2,18 +2,13 @@ import "./Viewfinder.css";
 
 export default function Viewfinder({ videoRef, error, flashPulse }) {
   return (
-    <div className="viewfinder">
+    <div className="viewfinder-fill">
       {error ? (
-        <p className="viewfinder__error">{error}</p>
+        <p className="viewfinder-fill__error">{error}</p>
       ) : (
-        <video ref={videoRef} className="viewfinder__video" muted playsInline />
+        <video ref={videoRef} className="viewfinder-fill__video" muted playsInline />
       )}
-      <div className="viewfinder__vignette" />
-      <div className="viewfinder__crosshair" aria-hidden="true">
-        <span />
-        <span />
-      </div>
-      {flashPulse && <div className="viewfinder__flash-pulse" />}
+      {flashPulse && <div className="viewfinder-fill__flash-pulse" />}
     </div>
   );
 }

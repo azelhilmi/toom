@@ -1,7 +1,7 @@
 import {
   doc, getDoc, getDocs, setDoc, updateDoc, increment, serverTimestamp,
   collection, addDoc, query, where, orderBy, limit, onSnapshot, Timestamp,
-  deleteDoc, writeBatch,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "./init";
 import { captureFrameAsBase64 } from "../utils/imageCompression";
@@ -183,13 +183,11 @@ function makeInviteCode() {
   return Math.random().toString(36).slice(2, 8).toUpperCase();
 }
 
-export async function createEvent(organizerId, { name, theme, shotsPerGuest, revealDate, customColors = null }) {
+export async function createEvent(organizerId, { name, shotsPerGuest, revealDate }) {
   const inviteCode = makeInviteCode();
   const docRef = await addDoc(collection(db, "events"), {
     organizerId,
     name,
-    theme,
-    customColors,
     shotsPerGuest,
     revealAt: Timestamp.fromDate(new Date(revealDate)),
     inviteCode,
@@ -263,7 +261,7 @@ export async function getEventByInviteCode(inviteCode) {
  * Un invité rejoint un événement : on crée sa pellicule dédiée
  * (cameras/{eventId_uid}) avec le quota de poses défini par l'organisateur.
  */
-export async function joinEvent(eventId, uid, guestName, shotsAllowed, theme) {
+export async function joinEvent(eventId, uid, guestName, shotsAllowed) {
   await setDoc(doc(db, "events", eventId, "guests", uid), {
     name: guestName,
     joinedAt: serverTimestamp(),
@@ -276,7 +274,6 @@ export async function joinEvent(eventId, uid, guestName, shotsAllowed, theme) {
     guestName,
     shotsAllowed,
     shotsUsed: 0,
-    theme,
     createdAt: serverTimestamp(),
   }, { merge: true });
   return cameraId;
@@ -318,47 +315,4 @@ export function listenToCustomization(uid, callback) {
 
 export async function deleteCustomBackground(uid) {
   await updateDoc(doc(db, CUSTOMIZATION_COLLECTION, uid), { background: null });
-}
-
-// Thèmes personnalisés complets
-const CUSTOM_THEMES_COLLECTION = "customThemes";
-
-/**
- * Sauvegarde un thème personnalisé complet
- */
-export async function saveCustomTheme(uid, themeData) {
-  await setDoc(
-    doc(db, CUSTOM_THEMES_COLLECTION, uid),
-    {
-      ...themeData,
-      ownerId: uid,
-      updatedAt: serverTimestamp()
-    },
-    { merge: true }
-  );
-}
-
-/**
- * Charge un thème personnalisé complet
- */
-export async function loadCustomTheme(uid) {
-  const snap = await getDoc(doc(db, CUSTOM_THEMES_COLLECTION, uid));
-  return snap.exists() ? snap.data() : null;
-}
-
-/**
- * Écoute les changements d'un thème personnalisé
- */
-export function listenToCustomTheme(uid, callback) {
-  return onSnapshot(
-    doc(db, CUSTOM_THEMES_COLLECTION, uid),
-    (snap) => callback(snap.exists() ? snap.data() : null)
-  );
-}
-
-/**
- * Supprime un thème personnalisé
- */
-export async function deleteCustomTheme(uid) {
-  await deleteDoc(doc(db, CUSTOM_THEMES_COLLECTION, uid));
 }

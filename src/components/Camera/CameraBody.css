@@ -1,182 +1,77 @@
 .camera-body {
+  position: relative;
   width: 100%;
-  max-width: 420px;
   height: 100%;
   min-height: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  background: var(--chassis-color, #000);
-  background-image: var(--chassis-texture, none), var(--custom-background, none);
-  background-size: auto, cover;
-  background-position: center;
-  background-repeat: repeat, no-repeat;
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.55),
-    0 2px 0 rgba(255, 255, 255, 0.04) inset,
-    0 -30px 50px rgba(0, 0, 0, 0.4) inset;
-  border-radius: 12px;
-  border: 3px solid var(--chassis-color-dark, #000);
-  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.camera-body__skin {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Étirement exact quelle que soit la taille de l'écran — pas de
+     recadrage (cover) ni de bandes noires (contain), comme demandé. */
+  object-fit: fill;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+}
+
+.camera-body__viewfinder-slot,
+.camera-body__pose-slot {
+  z-index: 1;
   overflow: hidden;
 }
 
-/* Reflet plastique diffus en haut du boîtier — casse l'aspect "à plat"
-   d'un simple aplat de couleur, comme la lumière qui accroche le
-   boîtier d'un vrai appareil. */
-.camera-body::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 30%);
-  pointer-events: none;
-  z-index: 1;
+.camera-body__hotspot {
+  z-index: 3;
 }
 
-.camera-body__top {
-  position: relative;
-  z-index: 2;
-  flex: 1.1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  padding: max(1rem, env(safe-area-inset-top)) 1rem 1.5rem;
-  min-height: 0;
-}
-
-.camera-body__top-row {
-  position: absolute;
-  top: max(1rem, env(safe-area-inset-top));
-  left: 1rem;
-  right: 1rem;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.camera-body__viewfinder-wrap {
-  margin-top: auto;
-}
-
-.camera-body__label {
-  flex-shrink: 0;
-  background-color: var(--body-color);
-  background-image: linear-gradient(180deg, var(--body-color) 0%, var(--body-color-dark) 100%), var(--chassis-texture, none);
-  border-top: 3px solid var(--body-shadow);
-  border-bottom: 3px solid var(--body-shadow);
-  padding: 1rem 1.1rem;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.8rem;
-  position: relative;
-  z-index: 2;
-  box-shadow:
-    inset 0 0 24px rgba(0, 0, 0, 0.5),
-    inset 0 2px 0 rgba(255, 255, 255, 0.15),
-    0 3px 10px rgba(0, 0, 0, 0.35);
-}
-
-.camera-body__brand {
-  display: flex;
-  flex-direction: column;
-  transform: rotate(-1.5deg);
-}
-
-.camera-body__brand-name {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.6rem;
-  color: var(--accent);
-  line-height: 1;
-}
-
-.camera-body__brand-tagline {
-  font-family: var(--font-body);
-  font-size: 0.68rem;
-  color: #c0392b;
-  font-style: italic;
-}
-
-.camera-body__bottom {
-  flex: 1;
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 0;
-}
-
-.camera-body__hint {
-  margin: 0.8rem 1rem 0;
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  color: #999;
-  text-align: center;
-  min-height: 1.6em;
-}
-
-.camera-body__shutter-row {
-  position: relative;
+.camera-body__hotspot,
+.camera-body__viewfinder-slot,
+.camera-body__pose-slot {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.camera-body__shutter {
-  width: 72px;
-  height: 72px;
+.camera-body__shutter-hotspot {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   border: none;
-  background-color: #222;
-  background-image:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 42%),
-    linear-gradient(180deg, #333 0%, #111 100%),
-    var(--chassis-texture, none);
+  background: transparent;
   cursor: pointer;
-  position: relative;
-  box-shadow:
-    0 5px 0 rgba(0, 0, 0, 0.55),
-    0 8px 14px rgba(0, 0, 0, 0.45),
-    inset 0 0 15px rgba(0, 0, 0, 0.8);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.camera-body__shutter:not(:disabled) {
-  background-color: #a11d1d;
-  background-image:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 42%),
-    linear-gradient(180deg, #e63946 0%, #a11d1d 100%),
-    var(--chassis-texture, none);
+.camera-body__shutter-hotspot:not(:disabled):active {
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.camera-body__shutter:disabled {
-  opacity: 0.5;
+.camera-body__shutter-hotspot:disabled {
   cursor: not-allowed;
 }
 
-.camera-body__shutter:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
-}
-
-.camera-body__shutter-ring {
+.camera-body__overlay-footer {
   position: absolute;
-  inset: 6px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  padding-top: 0.6rem;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.55) 40%, rgba(0, 0, 0, 0.7) 100%);
 }
 
-/* Orientation paysage : on garde exactement la même disposition
-   verticale qu'en portrait (viseur centré, bandeau, déclencheur) — elle
-   s'étire simplement sur toute la largeur disponible au lieu d'être
-   plafonnée à 420px. Les zones sont assez basses en hauteur (viseur
-   96px, bandeau ~110px, déclencheur 72px) pour tenir sans problème dans
-   une hauteur de paysage réduite. */
-@media (orientation: landscape) {
-  .camera-body {
-    max-width: none;
-  }
+.camera-body__hint {
+  margin: 0 1rem 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: #eee;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  min-height: 1.6em;
 }

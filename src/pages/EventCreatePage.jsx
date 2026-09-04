@@ -1,25 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { AVAILABLE_THEMES } from "../context/ThemeContext";
 import { createEvent } from "../firebase/firestore";
 import { generateInviteQrCode } from "../utils/qrCode";
 import "./EventCreatePage.css";
-
-const DEFAULT_CUSTOM_COLORS = {
-  bodyColor: "#f5c518",
-  bodyColorDark: "#d9a800",
-  bodyShadow: "#8a6a00",
-  accent: "#1a1a1a",
-  accentSoft: "#3a3a3a",
-};
 
 export default function EventCreatePage() {
   const { user, ready } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [theme, setTheme] = useState("kodak-funsaver");
-  const [customColors, setCustomColors] = useState(DEFAULT_CUSTOM_COLORS);
   const [shotsPerGuest, setShotsPerGuest] = useState(24);
   const [revealDate, setRevealDate] = useState("");
   const [result, setResult] = useState(null);
@@ -38,10 +27,8 @@ export default function EventCreatePage() {
     setSubmitting(true);
     const { eventId, inviteCode } = await createEvent(user.uid, {
       name,
-      theme,
       shotsPerGuest: Number(shotsPerGuest),
       revealDate,
-      customColors: theme === "custom" ? customColors : null,
     });
     setResult({ eventId, inviteCode });
     setSubmitting(false);
@@ -80,52 +67,6 @@ export default function EventCreatePage() {
         Nom de l'événement
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Mariage de Léa & Tom" required />
       </label>
-
-      <label>
-        Thème
-        <select value={theme} onChange={(e) => setTheme(e.target.value)}>
-          {AVAILABLE_THEMES.map((t) => (
-            <option key={t.id} value={t.id}>{t.label}</option>
-          ))}
-        </select>
-      </label>
-
-      {theme === "custom" && (
-        <div className="event-form__colors">
-          <label className="event-form__color-field">
-            Couleur principale
-            <input
-              type="color"
-              value={customColors.bodyColor}
-              onChange={(e) => setCustomColors((c) => ({ ...c, bodyColor: e.target.value }))}
-            />
-          </label>
-          <label className="event-form__color-field">
-            Couleur principale (foncé)
-            <input
-              type="color"
-              value={customColors.bodyColorDark}
-              onChange={(e) => setCustomColors((c) => ({ ...c, bodyColorDark: e.target.value }))}
-            />
-          </label>
-          <label className="event-form__color-field">
-            Couleur du texte / accent
-            <input
-              type="color"
-              value={customColors.accent}
-              onChange={(e) => setCustomColors((c) => ({ ...c, accent: e.target.value }))}
-            />
-          </label>
-          <label className="event-form__color-field">
-            Ombre du boîtier
-            <input
-              type="color"
-              value={customColors.bodyShadow}
-              onChange={(e) => setCustomColors((c) => ({ ...c, bodyShadow: e.target.value }))}
-            />
-          </label>
-        </div>
-      )}
 
       <label>
         Poses par invité

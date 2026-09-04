@@ -1,27 +1,27 @@
 import { useRef, useState } from "react";
 import "./FilmWheel.css";
 
-// Distance cumulée (en pixels) de glissé vers la droite nécessaire pour
-// armer l'appareil. Plusieurs petits glissés s'additionnent.
-const DRAG_DISTANCE_NEEDED = 160;
+// Distance cumulée (en pixels) de glissé nécessaire pour armer l'appareil.
+const DRAG_DISTANCE_NEEDED = 140;
 
-export default function FilmWheel({ armed, disabled, onArmed }) {
+export default function FilmWheel({ armed, disabled, onArmed, axis = "horizontal" }) {
   const [progress, setProgress] = useState(0); // 0 → 1
   const dragState = useRef(null);
 
   function handlePointerDown(e) {
     if (disabled || armed) return;
     e.currentTarget.setPointerCapture(e.pointerId);
-    dragState.current = { lastX: e.clientX };
+    dragState.current = { last: axis === "horizontal" ? e.clientX : e.clientY };
   }
 
   function handlePointerMove(e) {
     if (!dragState.current || disabled || armed) return;
-    const deltaX = e.clientX - dragState.current.lastX;
-    dragState.current.lastX = e.clientX;
-    if (deltaX <= 0) return; // seul le glissé vers la droite fait avancer le film
+    const current = axis === "horizontal" ? e.clientX : e.clientY;
+    const delta = current - dragState.current.last;
+    dragState.current.last = current;
+    if (delta <= 0) return; // seul le glissé dans le sens attendu (droite ou bas) compte
     setProgress((p) => {
-      const next = p + deltaX / DRAG_DISTANCE_NEEDED;
+      const next = p + delta / DRAG_DISTANCE_NEEDED;
       if (next >= 1) {
         onArmed();
         return 0;
@@ -31,41 +31,23 @@ export default function FilmWheel({ armed, disabled, onArmed }) {
   }
 
   function handlePointerUp(e) {
-    if (dragState.current) {
-      e.currentTarget.releasePointerCapture?.(e.pointerId);
-    }
+    if (dragState.current) e.currentTarget.releasePointerCapture?.(e.pointerId);
     dragState.current = null;
   }
 
   return (
-    <div className="film-wheel-group">
-      <div
-        className={`film-wheel ${armed ? "film-wheel--armed" : ""} ${disabled ? "film-wheel--disabled" : ""}`}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        role="slider"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={armed ? 100 : Math.round(progress * 100)}
-        aria-label={armed ? "Film remonté, prêt à photographier" : "Glisse vers la droite pour remonter le film"}
-      >
-        <div className="film-wheel__fill" style={{ width: `${Math.min(progress, 1) * 100}%` }} />
-        <div className="film-wheel__ridges">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <span key={i} className="film-wheel__ridge" />
-          ))}
-        </div>
-      </div>
-      {!armed && (
-        <span className="film-wheel-group__label">
-          GLISSER
-          <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
-            <path fill="currentColor" d="M4 11h13l-4.5-4.5L14 5l7 7-7 7-1.5-1.5L17 13H4z" />
-          </svg>
-        </span>
-      )}
-    </div>
+    <div
+      className={`film-wheel-hotspot ${armed ? "film-wheel-hotspot--armed" : ""}`}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      role="slider"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={armed ? 100 : Math.round(progress * 100)}
+      aria-label={armed ? "Film remonté" : `Glisse pour remonter le film`}
+      style={{ "--wheel-progress": progress }}
+    />
   );
 }

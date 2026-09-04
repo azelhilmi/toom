@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { setDisplayName } from "../firebase/auth";
 import { getEventByInviteCode, joinEvent } from "../firebase/firestore";
-import { useTheme } from "../context/ThemeContext";
 import "./EventCreatePage.css";
 
 export default function EventJoinPage() {
   const { inviteCode } = useParams();
   const navigate = useNavigate();
-  const { setTheme, setCustomColors } = useTheme();
   const [event, setEvent] = useState(undefined);
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -25,11 +23,7 @@ export default function EventJoinPage() {
     if (!name.trim()) return;
     setSubmitting(true);
     const user = await setDisplayName(name.trim());
-    await joinEvent(event.id, user.uid, name.trim(), event.shotsPerGuest, event.theme);
-    if (event.theme === "custom" && event.customColors) {
-      setCustomColors(event.customColors);
-    }
-    setTheme(event.theme);
+    await joinEvent(event.id, user.uid, name.trim(), event.shotsPerGuest);
     navigate(`/event/${event.id}/camera`);
   }
 

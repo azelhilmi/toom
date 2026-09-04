@@ -1,9 +1,5 @@
 import "./PoseCounter.css";
 
-export default function PoseCounter({ remaining, total }) {
-  return (
-    <div className="pose-counter" title={`${remaining} poses restantes sur ${total}`}>
-      {remaining}
-    </div>
-  );
+export default function PoseCounter({ remaining }) {
+  return <span className="pose-counter">{remaining}</span>;
 }
