@@ -45,7 +45,7 @@ export default function PhotoCard({ photo, index, now, forceReveal, onOpen }) {
         type="button"
         className="photo-card__frame"
         onClick={() => url && onOpen?.({ url, filename })}
-        disabled={!isRevealed || !url}
+        aria-disabled={!isRevealed || !url}
         aria-label={isRevealed ? "Agrandir la photo" : "Photo pas encore révélée"}
       >
         {isRevealed ? (
