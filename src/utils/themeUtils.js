@@ -31,19 +31,19 @@ export const DEFAULT_ELEMENTS = {
     type: 'button',
     icon: '🎯',
     position: { x: 50, y: 85 },
-    size: 18,
+    size: 20,
     zIndex: 10,
-    landscape: { x: 50, y: 90, size: 15 }
+    landscape: { x: 50, y: 90, size: 20 }
   },
   flashButton: {
     id: 'flashButton',
     label: 'Flash',
     type: 'button',
     icon: '⚡',
-    position: { x: 80, y: 15 },
-    size: 10,
+    position: { x: 63, y: 10 },
+    size: 20,
     zIndex: 10,
-    landscape: { x: 85, y: 10, size: 8 }
+    landscape: { x: 63, y: 10, size: 20 }
   },
   filmWheel: {
     id: 'filmWheel',
@@ -51,9 +51,9 @@ export const DEFAULT_ELEMENTS = {
     type: 'dial',
     icon: '🎞️',
     position: { x: 20, y: 10 },
-    size: 15,
+    size: 20,
     zIndex: 10,
-    landscape: { x: 10, y: 10, size: 12 }
+    landscape: { x: 20, y: 10, size: 20 }
   },
   poseCounter: {
     id: 'poseCounter',
@@ -61,9 +61,9 @@ export const DEFAULT_ELEMENTS = {
     type: 'text',
     icon: '🔢',
     position: { x: 80, y: 10 },
-    size: 8,
+    size: 20,
     zIndex: 10,
-    landscape: { x: 85, y: 5, size: 6 }
+    landscape: { x: 80, y: 10, size: 20 }
   },
   brandName: {
     id: 'brandName',

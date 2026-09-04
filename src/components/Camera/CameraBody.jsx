@@ -89,22 +89,24 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
   const renderElement = (elementId, Component, props = {}, defaultPosition) => {
     const element = customTheme?.elements?.[elementId];
     const config = getElementPosition(elementId, defaultPosition);
-    
+
     // Calculer la position absolue en % du conteneur
     const containerWidth = 420; // Largeur max du camera-body
     const containerHeight = 800; // Hauteur estimée
-    
+
     const posX = (config.position.x / 100) * containerWidth;
     const posY = (config.position.y / 100) * containerHeight;
-    const size = (config.size / 100) * Math.min(containerWidth, containerHeight);
-    
+    // Échelle relative : 20% = taille normale (1x). Un élément à 30%
+    // s'affiche 1.5x plus grand, un élément à 10% deux fois plus petit.
+    const scale = (config.size ?? 20) / 20;
+
     return (
       <div
         style={{
           position: 'absolute',
           left: `${posX}px`,
           top: `${posY}px`,
-          transform: 'translate(-50%, -50%)',
+          transform: `translate(-50%, -50%) scale(${scale})`,
           zIndex: element?.zIndex || props.zIndex || 0
         }}
       >
@@ -121,19 +123,19 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
             'poseCounter', 
             PoseCounter, 
             { remaining: Math.max(shotsRemaining, 0), total: shotsAllowed },
-            { position: { x: 80, y: 10 }, size: 8 }
+            { position: { x: 80, y: 10 }, size: 20 }
           )}
           {renderElement(
             'flashButton',
             FlashButton,
             { active: flashOn, torchSupported, onToggle: () => setFlashOn((v) => !v) },
-            { position: { x: 63, y: 10 }, size: 7 }
+            { position: { x: 63, y: 10 }, size: 20 }
           )}
           {renderElement(
             'filmWheel', 
             FilmWheel, 
             { armed, disabled: outOfFilm, onArmed: () => setArmed(true) },
-            { position: { x: 20, y: 10 }, size: 15 }
+            { position: { x: 20, y: 10 }, size: 20 }
           )}
         </div>
 
@@ -187,7 +189,7 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture }) 
               disabled: !armed || capturing || outOfFilm || !ready,
               'aria-label': 'Déclencher'
             },
-            { position: { x: 50, y: 85 }, size: 18 }
+            { position: { x: 50, y: 85 }, size: 20 }
           )}
         </div>
 

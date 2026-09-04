@@ -24,11 +24,6 @@ export default function SettingsPage() {
       return;
     }
 
-    if (file.size > 500 * 1024) {
-      setUploadError('L\'image doit faire moins de 500 Ko');
-      return;
-    }
-
     setIsUploading(true);
     setUploadError(null);
 
@@ -120,7 +115,8 @@ export default function SettingsPage() {
       <section className="settings-page__section">
         <h2>Arrière-plan personnalisé</h2>
         <p className="settings-page__hint">
-          Upload une image pour le boîtier de ton appareil (max 500 Ko).
+          Upload n'importe quelle photo pour le boîtier de ton appareil — elle
+          est automatiquement compressée, quelle que soit sa taille d'origine.
           Les boutons et le viseur resteront par-dessus.
         </p>
         
