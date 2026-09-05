@@ -2,8 +2,9 @@ import { useState } from "react";
 import { downloadImage, shareImage } from "../../utils/saveImage";
 import "./Lightbox.css";
 
-export default function Lightbox({ url, filename, onClose }) {
+export default function Lightbox({ url, filename, onClose, onDelete }) {
   const [status, setStatus] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   async function handleShare() {
     setStatus("En cours…");
@@ -25,6 +26,14 @@ export default function Lightbox({ url, filename, onClose }) {
     setTimeout(() => setStatus(null), 2500);
   }
 
+  async function handleDelete() {
+    if (!onDelete) return;
+    if (!window.confirm("Supprimer définitivement cette photo ? Cette action est irréversible.")) return;
+    setDeleting(true);
+    await onDelete();
+    setDeleting(false);
+  }
+
   return (
     <div className="lightbox" onClick={onClose}>
       <button type="button" className="lightbox__close" onClick={onClose} aria-label="Fermer">
@@ -42,6 +51,11 @@ export default function Lightbox({ url, filename, onClose }) {
         <button type="button" className="lightbox__button lightbox__button--primary" onClick={handleShare}>
           Partager
         </button>
+        {onDelete && (
+          <button type="button" className="lightbox__button lightbox__button--danger" onClick={handleDelete} disabled={deleting}>
+            {deleting ? "Suppression…" : "Supprimer"}
+          </button>
+        )}
       </div>
 
       {status && <p className="lightbox__status">{status}</p>}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PhotoCard from "./PhotoCard";
 import Lightbox from "./Lightbox";
+import { deletePhoto } from "../../firebase/firestore";
 import "./Gallery.css";
 
 const EASTER_EGG_CLICKS = 10;
@@ -57,7 +58,15 @@ export default function Gallery({ photos }) {
       </div>
 
       {openPhoto && (
-        <Lightbox url={openPhoto.url} filename={openPhoto.filename} onClose={() => setOpenPhoto(null)} />
+        <Lightbox
+          url={openPhoto.url}
+          filename={openPhoto.filename}
+          onClose={() => setOpenPhoto(null)}
+          onDelete={async () => {
+            await deletePhoto(openPhoto.id);
+            setOpenPhoto(null);
+          }}
+        />
       )}
     </div>
   );

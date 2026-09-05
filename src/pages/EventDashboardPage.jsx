@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import PhotoCard from "../components/Gallery/PhotoCard";
 import Lightbox from "../components/Gallery/Lightbox";
 import {
   listenEventGuests, listenEventPhotos, getEvent, updateEvent,
   syncGuestShotsAllowed, resetGuestRoll, saveEventTheme, clearEventTheme,
+  deletePhoto, deleteEvent,
 } from "../firebase/firestore";
 import { imageToOptimizedBase64 } from "../utils/imageCompression";
 import { downloadPhotosAsZip } from "../utils/downloadAlbum";
@@ -24,6 +25,7 @@ function toDatetimeLocalValue(timestamp) {
 
 export default function EventDashboardPage() {
   const { eventId } = useParams();
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [guests, setGuests] = useState([]);
   const [photos, setPhotos] = useState([]);
@@ -148,6 +150,15 @@ export default function EventDashboardPage() {
       (done, total) => setZipProgress({ label: "album complet", done, total })
     );
     setZipProgress(null);
+  }
+
+  async function handleDeleteEvent() {
+    const confirmed = window.confirm(
+      `Supprimer définitivement "${event.name}" ainsi que toutes les photos et pellicules des invités ? Cette action est irréversible.`
+    );
+    if (!confirmed) return;
+    await deleteEvent(eventId);
+    navigate("/event");
   }
 
   if (!event || !form) return <LoadingScreen />;
@@ -282,6 +293,15 @@ export default function EventDashboardPage() {
           <button type="submit" className="event-dashboard__btn event-dashboard__btn--primary" disabled={saving}>
             {saving ? "Enregistrement…" : "Enregistrer les réglages"}
           </button>
+
+          <div className="event-dashboard__danger-zone">
+            <p className="event-dashboard__note">
+              Supprime définitivement cet événement, toutes ses photos et les pellicules des invités.
+            </p>
+            <button type="button" className="event-dashboard__link-btn event-dashboard__link-btn--danger" onClick={handleDeleteEvent}>
+              Supprimer l'événement
+            </button>
+          </div>
         </form>
       )}
 
@@ -328,7 +348,15 @@ export default function EventDashboardPage() {
       })}
 
       {openPhoto && (
-        <Lightbox url={openPhoto.url} filename={openPhoto.filename} onClose={() => setOpenPhoto(null)} />
+        <Lightbox
+          url={openPhoto.url}
+          filename={openPhoto.filename}
+          onClose={() => setOpenPhoto(null)}
+          onDelete={async () => {
+            await deletePhoto(openPhoto.id);
+            setOpenPhoto(null);
+          }}
+        />
       )}
     </div>
   );

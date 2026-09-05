@@ -355,6 +355,41 @@ export function listenEventPhotos(eventId, callback) {
   return onSnapshot(q, (snap) => callback(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
 }
 
+/**
+ * Supprime entièrement un événement : l'événement lui-même, ses
+ * invités, son thème imposé (s'il existe), toutes les photos qui lui
+ * sont rattachées (avec leurs morceaux d'image) et les pellicules des
+ * invités. Irréversible.
+ */
+export async function deleteEvent(eventId) {
+  // Photos de l'événement (avec leurs morceaux d'image — potentiellement
+  // nombreuses, on les supprime une par une plutôt qu'en un seul batch
+  // pour ne pas risquer de dépasser la limite de 500 opérations).
+  const photosSnap = await getDocs(query(collection(db, "photos"), where("eventId", "==", eventId)));
+  await Promise.all(photosSnap.docs.map((d) => deletePhoto(d.id)));
+
+  // Invités et pellicules associées.
+  const guestsSnap = await getDocs(collection(db, "events", eventId, "guests"));
+  await Promise.all(
+    guestsSnap.docs.map((g) =>
+      Promise.all([
+        deleteDoc(doc(db, "events", eventId, "guests", g.id)),
+        deleteDoc(doc(db, "cameras", `${eventId}_${g.id}`)).catch(() => {}),
+      ])
+    )
+  );
+
+  // Thème imposé, s'il existe.
+  const event = await getEvent(eventId);
+  const themeChunkCount = event?.themeChunkCount || 0;
+  const batch = writeBatch(db);
+  for (let i = 0; i < themeChunkCount; i++) {
+    batch.delete(eventThemeChunkRef(eventId, i));
+  }
+  batch.delete(doc(db, "events", eventId));
+  await batch.commit();
+}
+
 // ---------- Thèmes personnalisés (plusieurs, nommés) ----------
 //
 // Un thème = un nom + une image de fond (le corps de l'appareil) +

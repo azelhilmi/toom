@@ -30,6 +30,11 @@ service cloud.firestore {
         (resource.data.eventId != null &&
           get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid)
       );
+      allow delete: if isSignedIn() && (
+        resource.data.ownerId == request.auth.uid ||
+        (resource.data.eventId != null &&
+          get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid)
+      );
     }
 
     // photos/{photoId} : métadonnées légères (pas l'image elle-même).
@@ -120,10 +125,14 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.organizerId == request.auth.uid;
       allow update: if isSignedIn() && resource.data.organizerId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.organizerId == request.auth.uid;
 
       match /guests/{guestId} {
         allow read: if isSignedIn();
-        allow write: if isSignedIn() && request.auth.uid == guestId;
+        allow write: if isSignedIn() && (
+          request.auth.uid == guestId ||
+          get(/databases/$(database)/documents/events/$(eventId)).data.organizerId == request.auth.uid
+        );
       }
 
       // Morceaux du thème imposé par l'organisateur (fond + couleur du

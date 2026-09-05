@@ -58,6 +58,16 @@
   font-weight: 600;
 }
 
+.lightbox__button--danger {
+  border-color: #c8102e;
+  color: #ff5c6c;
+}
+
+.lightbox__button--danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .lightbox__status {
   margin-top: 0.8rem;
   color: #ccc;
