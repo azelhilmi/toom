@@ -12,9 +12,43 @@
     <meta name="apple-mobile-web-app-title" content="Toom" />
     <meta name="theme-color" content="#c8102e" />
     <title>Toom — We'll see tomorrow</title>
+    <style>
+      #splash {
+        position: fixed;
+        inset: 0;
+        background: #c8102e;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        z-index: 9999;
+      }
+      #splash img {
+        width: min(38vw, 160px);
+        height: min(38vw, 160px);
+        animation: splash-pulse 1.6s ease-in-out infinite;
+      }
+      #splash span {
+        font-family: "Rockwell", "Roboto Condensed", sans-serif;
+        font-style: italic;
+        color: #fff;
+        font-size: 0.95rem;
+        opacity: 0.9;
+      }
+      @keyframes splash-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="splash">
+        <img src="/brand/icon-512.png" alt="Toom" />
+        <span>We'll see tomorrow</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

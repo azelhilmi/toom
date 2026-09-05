@@ -86,7 +86,11 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
       </div>
 
       {/* Couche 2 : l'image du boîtier (par défaut ou personnalisée),
-          étirée pour remplir exactement l'écran quelle que soit sa taille. */}
+          étirée pour remplir exactement l'écran quelle que soit sa taille.
+          Pour une image personnalisée, seules les 2 fenêtres (viseur,
+          poses) sont découpées — le reste du corps est entièrement
+          recouvert par la photo, exactement comme le jaune du thème
+          par défaut. */}
       <img
         className="camera-body__skin"
         src={customSkin || layout.skin}
@@ -95,8 +99,8 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
         style={
           customSkin
             ? {
-                WebkitMaskImage: `url(${layout.mask})`,
-                maskImage: `url(${layout.mask})`,
+                WebkitMaskImage: `url(${layout.windowsCutout})`,
+                maskImage: `url(${layout.windowsCutout})`,
                 WebkitMaskSize: "100% 100%",
                 maskSize: "100% 100%",
                 WebkitMaskRepeat: "no-repeat",
@@ -106,11 +110,11 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
         }
       />
 
-      {/* Sur une image personnalisée uniquement : le masque est réappliqué
-          par-dessus, cette fois en tant qu'image visible (fusion "multiply")
-          plutôt que comme découpe alpha. Ça restitue le relief du boîtier
-          (contours du viseur, des boutons, de la molette) qui donnerait
-          sinon un aplat de photo sans plus aucun aspect "appareil photo". */}
+      {/* Sur une image personnalisée uniquement : le mécanisme (boutons,
+          molette, grip) reste fixe et gris — il est dessiné dans le
+          masque d'origine, qui est déjà transparent partout ailleurs
+          (corps ET fenêtres), donc superposable tel quel sans traitement
+          particulier. */}
       {customSkin && (
         <img
           className="camera-body__skin-relief"

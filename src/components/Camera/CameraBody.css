@@ -26,15 +26,9 @@
   width: 100%;
   height: 100%;
   object-fit: fill;
-  z-index: 2;
+  z-index: 3;
   pointer-events: none;
   user-select: none;
-  /* Le blanc du masque (corps de l'appareil) devient neutre en
-     multiply — seuls les reliefs gris (viseur, boutons, molette)
-     assombrissent légèrement l'image personnalisée en dessous,
-     ce qui rend leur forme visible sans masquer sa couleur. */
-  mix-blend-mode: multiply;
-  opacity: 0.9;
 }
 
 .camera-body__viewfinder-slot,
