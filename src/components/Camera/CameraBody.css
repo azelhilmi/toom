@@ -31,6 +31,17 @@
   user-select: none;
 }
 
+.camera-body__default-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image: var(--chassis-texture, none);
+  background-repeat: repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
 .camera-body__viewfinder-slot,
 .camera-body__pose-slot {
   z-index: 1;
@@ -84,6 +95,18 @@
   border: 2px solid #c8102e;
   border-radius: 10px;
   padding: 0.6rem 0.9rem;
+}
+
+/* En paysage, le déclencheur est centré en bas — un bandeau plein
+   largeur le chevauche forcément. On bascule sur une colonne étroite
+   à gauche, hors de sa zone (et de celle du compte-poses à droite). */
+@media (orientation: landscape) {
+  .camera-body__status-label {
+    left: 3%;
+    right: auto;
+    width: 33%;
+    bottom: 8%;
+  }
 }
 
 .camera-body__status-text {

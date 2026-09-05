@@ -1,4 +1,12 @@
 .pose-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #fdfdfd;
+  border-radius: 18%;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.25);
   font-family: var(--font-display, "Rockwell", serif);
   font-weight: 700;
   font-size: clamp(0.9rem, 4.5vmin, 1.6rem);

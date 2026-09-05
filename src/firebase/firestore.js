@@ -247,6 +247,18 @@ export async function getEvent(eventId) {
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
+/**
+ * Écoute les événements créés par cet utilisateur (organisateur), pour
+ * lui permettre d'accéder directement à leur tableau de bord depuis le
+ * menu sans avoir à retrouver le lien.
+ */
+export function listenMyEvents(uid, callback) {
+  const q = query(collection(db, "events"), where("organizerId", "==", uid));
+  return onSnapshot(q, (snap) => {
+    callback(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+  });
+}
+
 export async function getEventByInviteCode(inviteCode) {
   const q = query(collection(db, "events"), where("inviteCode", "==", inviteCode));
   return new Promise((resolve) => {

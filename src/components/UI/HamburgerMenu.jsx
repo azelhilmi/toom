@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { listenMyEvents } from "../../firebase/firestore";
 import "./HamburgerMenu.css";
 
 const LINKS = [
@@ -37,6 +39,13 @@ const LINKS = [
 
 export default function HamburgerMenu() {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
+  const [myEvents, setMyEvents] = useState([]);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    return listenMyEvents(user.uid, setMyEvents);
+  }, [user?.uid]);
 
   return (
     <div className="hamburger-menu">
@@ -77,6 +86,30 @@ export default function HamburgerMenu() {
                   </span>
                 </Link>
               ))}
+
+              {myEvents.length > 0 && (
+                <>
+                  <p className="hamburger-modal__section-title">Mes événements</p>
+                  {myEvents.map((e) => (
+                    <Link
+                      key={e.id}
+                      to={`/event/${e.id}`}
+                      className="hamburger-modal__link hamburger-modal__link--compact"
+                      onClick={() => setOpen(false)}
+                    >
+                      <span className="hamburger-modal__link-icon hamburger-modal__link-icon--small">
+                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                          <path fill="currentColor" d="M4 5a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2H4zm0 2h16v10H4V7zm3 1.5A1.5 1.5 0 108.5 10 1.5 1.5 0 007 8.5zM6 16l3.5-4.5 2.5 3L15 10l3 6H6z" />
+                        </svg>
+                      </span>
+                      <span className="hamburger-modal__link-text">
+                        <span className="hamburger-modal__link-label">{e.name}</span>
+                        <span className="hamburger-modal__link-desc">Tableau de bord organisateur</span>
+                      </span>
+                    </Link>
+                  ))}
+                </>
+              )}
             </nav>
           </div>
         </div>

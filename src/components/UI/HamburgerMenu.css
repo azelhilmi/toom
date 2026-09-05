@@ -142,3 +142,22 @@
   font-size: 0.76rem;
   color: #999;
 }
+
+.hamburger-modal__section-title {
+  margin: 0.6rem 0.7rem 0.3rem;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #777;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.7rem;
+}
+
+.hamburger-modal__link--compact {
+  padding: 0.65rem 0.7rem;
+}
+
+.hamburger-modal__link-icon--small {
+  width: 34px;
+  height: 34px;
+}
