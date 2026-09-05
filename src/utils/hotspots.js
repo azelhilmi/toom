@@ -34,6 +34,14 @@ export const HOTSPOTS = {
     // marge de sécurité large (>8%) des deux côtés, plus généreuse que
     // le minimum de 5% demandé pour absorber toute variation d'écran.
     instructionsZone: { x: 50, y: 39, w: 88, h: 25 },
+    // Petites annotations imprimées façon vrai jetable (thème par
+    // défaut uniquement) — placées juste à côté des commandes qu'elles
+    // désignent, sans jamais recouvrir leur zone cliquable.
+    annotations: {
+      wheelLabel: { x: 91, y: 24, w: 16, h: 5 },
+      flashLabel: { x: 71, y: 22, w: 12, h: 4 },
+      badge: { x: 10, y: 90, w: 16, h: 8 },
+    },
   },
   portrait: {
     skin: "/skins/default-vertical.webp",
@@ -49,6 +57,11 @@ export const HOTSPOTS = {
     // d'instructions resserrée avec marge large des deux côtés
     // (>6.5%) plutôt que le minimum tout juste suffisant d'avant.
     instructionsZone: { x: 50, y: 48, w: 86, h: 15 },
+    annotations: {
+      wheelLabel: { x: 89.9, y: 22, w: 16, h: 4 },
+      flashLabel: { x: 84.6, y: 38, w: 16, h: 4 },
+      badge: { x: 15, y: 90, w: 20, h: 7 },
+    },
   },
 };
 

@@ -5,6 +5,7 @@ import PoseCounter from "./PoseCounter";
 import FlashButton from "./FlashButton";
 import HamburgerMenu from "../UI/HamburgerMenu";
 import InstructionsOverlay from "./InstructionsOverlay";
+import DefaultThemeAnnotations from "./DefaultThemeAnnotations";
 import DevelopClock from "./DevelopClock";
 import { useCameraStream } from "../../utils/useCameraStream";
 import { requestAppFullscreen } from "../../utils/fullscreen";
@@ -127,6 +128,7 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
       {/* Sur le thème par défaut uniquement : léger grain texturé pour
           casser l'aplat de couleur, qui paraissait un peu vide/plat. */}
       {!customSkin && <div className="camera-body__default-texture" aria-hidden="true" />}
+      {!customSkin && <DefaultThemeAnnotations layout={layout} />}
 
       {/* Couche 3 : zones fonctionnelles transparentes, superposées
           exactement à l'endroit où l'image dessine chaque contrôle. */}
