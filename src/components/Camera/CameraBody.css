@@ -31,16 +31,7 @@
   user-select: none;
 }
 
-.camera-body__default-texture {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background-image: var(--chassis-texture, none);
-  background-repeat: repeat;
-  mix-blend-mode: multiply;
-  opacity: 0.5;
-}
+
 
 .camera-body__viewfinder-slot,
 .camera-body__pose-slot {

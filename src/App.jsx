@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import AppSplash from "./components/AppSplash";
 import CameraPage from "./pages/CameraPage";
 import GalleryPage from "./pages/GalleryPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -14,6 +15,7 @@ import EventDashboardPage from "./pages/EventDashboardPage";
 export default function App() {
   return (
     <AuthProvider>
+      <AppSplash />
       <ThemeProvider>
         <BrowserRouter>
           <div className="app-shell">

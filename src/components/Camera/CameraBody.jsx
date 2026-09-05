@@ -6,7 +6,6 @@ import FlashButton from "./FlashButton";
 import HamburgerMenu from "../UI/HamburgerMenu";
 import GalleryShortcut from "../UI/GalleryShortcut";
 import InstructionsOverlay from "./InstructionsOverlay";
-import DefaultThemeAnnotations from "./DefaultThemeAnnotations";
 import DevelopClock from "./DevelopClock";
 import { useCameraStream } from "../../utils/useCameraStream";
 import { requestAppFullscreen } from "../../utils/fullscreen";
@@ -150,8 +149,6 @@ export default function CameraBody({
 
       {/* Sur le thème par défaut uniquement : léger grain texturé pour
           casser l'aplat de couleur, qui paraissait un peu vide/plat. */}
-      {!customSkin && <div className="camera-body__default-texture" aria-hidden="true" />}
-      <DefaultThemeAnnotations layout={layout} />
 
       {/* Couche 3 : zones fonctionnelles transparentes, superposées
           exactement à l'endroit où l'image dessine chaque contrôle. */}
