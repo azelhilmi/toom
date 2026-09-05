@@ -77,7 +77,7 @@
 
 .camera-body__status-label {
   position: absolute;
-  left: 4%;
+  left: 4.5rem;
   right: 4%;
   bottom: max(1.2rem, env(safe-area-inset-bottom));
   z-index: 5;
@@ -88,13 +88,13 @@
   padding: 0.6rem 0.9rem;
 }
 
-/* En paysage, le déclencheur est centré en bas — un bandeau plein
-   largeur le chevauche forcément. On bascule sur une colonne étroite
-   à gauche, hors de sa zone (et de celle du compte-poses à droite). */
+/* En paysage, le déclencheur est centré en bas et la galerie occupe
+   le bas-gauche — bandeau de statut basculé à droite, hors de leurs
+   zones respectives (et de celle du compte-poses). */
 @media (orientation: landscape) {
   .camera-body__status-label {
-    left: 3%;
-    right: auto;
+    left: auto;
+    right: 3%;
     width: 33%;
     bottom: 8%;
   }

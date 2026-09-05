@@ -33,6 +33,7 @@ export default function EventCameraPage() {
       flashUsed,
       guestName: roll.guestName,
       eventId,
+      eventName: event.name,
       // Date de révélation commune fixée par l'organisateur (pas de
       // logique "24h après la 1ère photo" ici, contrairement à la
       // pellicule perso — tout le monde se révèle en même temps).

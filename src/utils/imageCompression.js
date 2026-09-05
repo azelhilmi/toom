@@ -19,7 +19,7 @@ const IMAGE_QUALITY = 0.82;
  * @param {HTMLVideoElement} videoEl
  * @returns {Promise<Blob>}
  */
-export async function captureFramePrintQuality(videoEl) {
+export async function captureFramePrintQuality(videoEl, { eventName = null } = {}) {
   const nativeLong = Math.max(videoEl.videoWidth, videoEl.videoHeight);
   const scale = Math.min(1, PRINT_LONG_EDGE / nativeLong);
   const width = Math.round(videoEl.videoWidth * scale);
@@ -30,16 +30,22 @@ export async function captureFramePrintQuality(videoEl) {
   canvas.height = height;
   const ctx = canvas.getContext("2d");
 
-  // Rendu "pellicule bon marché des années 90-2000" : teinte chaude
-  // orangée plus marquée, contraste et saturation punchy typiques du
-  // développement en 1h en drugstore, légère douceur d'optique bas de
-  // gamme. Baked dans l'image (pas un filtre CSS d'aperçu) : la photo
+  // Rendu "pellicule bon marché des années 90-2000", version vieillie :
+  // moins de punch, plus de sépia, comme un tirage qui a pris la
+  // lumière. Baked dans l'image (pas un filtre CSS d'aperçu) : la photo
   // garde ce rendu même une fois téléchargée/imprimée.
-  ctx.filter = "sepia(0.32) saturate(1.5) contrast(1.16) brightness(1.05) hue-rotate(-12deg) blur(0.4px)";
+  ctx.filter = "sepia(0.42) saturate(1.15) contrast(1.04) brightness(1.02) hue-rotate(-10deg) blur(0.4px)";
   ctx.drawImage(videoEl, 0, 0, width, height);
 
+  applyAgedWash(ctx, width, height);
   applyVignette(ctx, width, height);
-  applyGrain(ctx, width, height, 12); // grain plus marqué, franchement visible comme sur une vraie pellicule
+  applyGrain(ctx, width, height, 12);
+  applyDustAndScratches(ctx, width, height);
+
+  // Coordonnées GPS best-effort (jamais bloquant : 1.5s max, silencieux
+  // si refusé/indisponible) avant de graver le date-stamp.
+  const position = await getPositionWithTimeout(1500);
+  drawDateStamp(ctx, width, height, { eventName, position });
 
   const webpBlob = await canvasToBlob(canvas, "image/webp", IMAGE_QUALITY);
   if (webpBlob && webpBlob.type === "image/webp") return webpBlob;
@@ -75,8 +81,8 @@ export function blobToBase64(blob) {
  * @param {HTMLVideoElement} videoEl
  * @returns {Promise<string>}
  */
-export async function captureFrameAsBase64(videoEl) {
-  const blob = await captureFramePrintQuality(videoEl);
+export async function captureFrameAsBase64(videoEl, options) {
+  const blob = await captureFramePrintQuality(videoEl, options);
   return blobToBase64(blob);
 }
 
@@ -118,6 +124,124 @@ function applyGrain(ctx, width, height, intensity) {
     data[i + 2] += noise;
   }
   ctx.putImageData(imageData, 0, 0);
+}
+
+/**
+ * Lavis chaud et légèrement inégal par-dessus toute l'image, comme un
+ * tirage qui a pris la lumière avec le temps — plus marqué sur les
+ * bords, jamais tout à fait uniforme.
+ */
+function applyAgedWash(ctx, width, height) {
+  ctx.save();
+  ctx.filter = "none";
+  ctx.globalCompositeOperation = "multiply";
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, "rgba(214, 178, 122, 0.9)");
+  gradient.addColorStop(0.5, "rgba(224, 196, 150, 1)");
+  gradient.addColorStop(1, "rgba(206, 166, 110, 0.9)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+}
+
+/**
+ * Quelques poussières et rayures fines semi-transparentes, comme sur
+ * une vieille pellicule scannée — en nombre et opacité limités pour
+ * rester discret, pas façon filtre Instagram appuyé.
+ */
+function applyDustAndScratches(ctx, width, height) {
+  ctx.save();
+  ctx.filter = "none";
+
+  // Poussières : petits points clairs épars.
+  const dustCount = Math.round((width * height) / 90000);
+  ctx.fillStyle = "rgba(255, 250, 240, 0.5)";
+  for (let i = 0; i < dustCount; i++) {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
+    const r = Math.random() * 1.2 + 0.3;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Rayures : quelques traits verticaux fins et courts, opacité faible.
+  const scratchCount = Math.round(width / 500) + 1;
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+  ctx.lineWidth = 1;
+  for (let i = 0; i < scratchCount; i++) {
+    const x = Math.random() * width;
+    const yStart = Math.random() * height * 0.6;
+    const len = height * (0.2 + Math.random() * 0.3);
+    ctx.beginPath();
+    ctx.moveTo(x, yStart);
+    ctx.lineTo(x + (Math.random() - 0.5) * 4, yStart + len);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+/**
+ * Position GPS best-effort : ne bloque jamais la prise de vue plus de
+ * `timeoutMs`, et échoue silencieusement (refus, indisponibilité,
+ * contexte non sécurisé) plutôt que de faire planter la capture.
+ */
+function getPositionWithTimeout(timeoutMs) {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve(null);
+      return;
+    }
+    const timer = setTimeout(() => resolve(null), timeoutMs);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        clearTimeout(timer);
+        resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+      },
+      () => {
+        clearTimeout(timer);
+        resolve(null);
+      },
+      { timeout: timeoutMs, maximumAge: 300_000 }
+    );
+  });
+}
+
+function formatCoord(value, posLetter, negLetter) {
+  const letter = value >= 0 ? posLetter : negLetter;
+  return `${Math.abs(value).toFixed(3)}°${letter}`;
+}
+
+/**
+ * Grave la ligne "date-stamp" orangée en bas de la photo, comme les
+ * appareils compacts/jetables des années 90 qui impressionnaient la
+ * date directement sur le négatif : date, événement (le cas échéant)
+ * et position GPS (si disponible), sur une seule ligne discrète.
+ */
+function drawDateStamp(ctx, width, height, { eventName, position }) {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const parts = [`${pad(d.getDate())} ${pad(d.getMonth() + 1)} ${String(d.getFullYear()).slice(2)}`];
+  if (eventName) parts.push(eventName.toUpperCase());
+  if (position) parts.push(`${formatCoord(position.lat, "N", "S")} ${formatCoord(position.lon, "E", "O")}`);
+  const text = parts.join("   ");
+
+  const fontSize = Math.max(14, Math.round(width * 0.022));
+  ctx.save();
+  ctx.filter = "none";
+  ctx.font = `700 ${fontSize}px "Courier New", monospace`;
+  ctx.textBaseline = "alphabetic";
+  ctx.textAlign = "right";
+  const x = width - fontSize * 0.9;
+  const y = height - fontSize * 1.1;
+
+  // Léger halo sombre pour rester lisible quel que soit le fond de la photo.
+  ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+  ctx.shadowBlur = fontSize * 0.25;
+  ctx.fillStyle = "#ff7a1a";
+  ctx.fillText(text, x, y);
+  ctx.restore();
 }
 
 /**

@@ -32,12 +32,16 @@ export async function getOrCreateActiveRoll(uid, theme = "kodak-funsaver") {
   if (!snap.empty) {
     const existing = snap.docs[0];
     const data = existing.data();
-    const isFull = data.shotsUsed >= data.shotsAllowed;
     const isDeveloped = data.revealAt ? data.revealAt.toMillis() <= Date.now() : false;
-    if (!isFull || !isDeveloped) {
+    // Tant que la pellicule n'a pas atteint sa date de révélation, on
+    // continue de l'utiliser (pleine ou non). Une fois développée, on
+    // repart sur une neuve dans tous les cas — sinon une photo prise
+    // longtemps après coup sur une pellicule jamais remplie hériterait
+    // d'une date de révélation déjà dépassée et s'afficherait
+    // immédiatement, sans les 24h d'attente.
+    if (!isDeveloped) {
       return existing.id;
     }
-    // Sinon : pellicule pleine ET développée → on en crée une nouvelle.
   }
 
   const cameraId = `${uid}_roll_${Date.now()}`;
@@ -83,8 +87,8 @@ const CHUNK_SIZE = 650_000;
  * de cette même date : le développement se fait pour tout le rouleau
  * d'un coup, comme demandé, pas photo par photo.
  */
-export async function takePhoto({ cameraId, ownerId, videoEl, flashUsed, guestName = null, eventId = null, revealAtOverride = null }) {
-  const base64 = await captureFrameAsBase64(videoEl);
+export async function takePhoto({ cameraId, ownerId, videoEl, flashUsed, guestName = null, eventId = null, eventName = null, revealAtOverride = null }) {
+  const base64 = await captureFrameAsBase64(videoEl, { eventName });
 
   const cameraRef = doc(db, "cameras", cameraId);
   let revealAt = revealAtOverride;
