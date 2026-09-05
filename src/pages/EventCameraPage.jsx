@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CameraBody from "../components/Camera/CameraBody";
 import { useAuth } from "../context/AuthContext";
-import { listenToRoll, takePhoto, getEvent } from "../firebase/firestore";
+import { listenToRoll, takePhoto, getEvent, getEventTheme } from "../firebase/firestore";
 import LoadingScreen from "../components/UI/LoadingScreen";
 
 export default function EventCameraPage() {
@@ -10,16 +10,18 @@ export default function EventCameraPage() {
   const { user, ready } = useAuth();
   const [roll, setRoll] = useState(null);
   const [event, setEvent] = useState(null);
+  const [eventTheme, setEventTheme] = useState(undefined); // undefined = pas encore chargé, null = pas de thème imposé
 
   useEffect(() => {
     if (!ready || !user) return;
     const cameraId = `${eventId}_${user.uid}`;
     const unsub = listenToRoll(cameraId, setRoll);
     getEvent(eventId).then(setEvent);
+    getEventTheme(eventId).then(setEventTheme);
     return unsub;
   }, [ready, user, eventId]);
 
-  if (!ready || !roll || !event) {
+  if (!ready || !roll || !event || eventTheme === undefined) {
     return <LoadingScreen message="Chargement de ta pellicule d'événement…" />;
   }
 
@@ -47,6 +49,8 @@ export default function EventCameraPage() {
       shotsAllowed={roll.shotsAllowed}
       onCapture={handleCapture}
       developingUntilMs={isFull ? revealAtMs : null}
+      overrideSkin={eventTheme ? eventTheme.background : undefined}
+      overrideMaskColor={eventTheme ? eventTheme.maskColor : undefined}
     />
   );
 }

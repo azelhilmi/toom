@@ -115,11 +115,6 @@ service cloud.firestore {
       }
     }
 
-    match /customThemes/{uid} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn() && request.auth.uid == uid;
-    }
-
     // events/{eventId}
     match /events/{eventId} {
       allow read: if isSignedIn();
@@ -129,6 +124,15 @@ service cloud.firestore {
       match /guests/{guestId} {
         allow read: if isSignedIn();
         allow write: if isSignedIn() && request.auth.uid == guestId;
+      }
+
+      // Morceaux du thème imposé par l'organisateur (fond + couleur du
+      // mécanisme) — lisibles par tous les invités, modifiables
+      // seulement par l'organisateur.
+      match /themeChunks/{chunkId} {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn() &&
+          get(/databases/$(database)/documents/events/$(eventId)).data.organizerId == request.auth.uid;
       }
     }
   }

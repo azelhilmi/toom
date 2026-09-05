@@ -209,7 +209,7 @@ export default function SettingsPage() {
                     checked={transparent}
                     onChange={(e) => setTransparent(e.target.checked)}
                   />
-                  Transparent (laisse voir le fond partout)
+                  Transparent (garde le gris d'origine du mécanisme)
                 </label>
               </div>
             </label>

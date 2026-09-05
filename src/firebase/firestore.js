@@ -247,6 +247,56 @@ export async function getEvent(eventId) {
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
+// ---------- Thème imposé par un événement ----------
+//
+// L'organisateur peut imposer un thème (fond + couleur du mécanisme)
+// à TOUS ses invités, qui prime alors sur leur thème personnel pour
+// la durée de l'événement. Même stratégie de découpage que pour les
+// thèmes personnels — voir plus bas.
+
+const EVENT_THEME_CHUNK_SIZE = 650_000;
+
+function eventThemeChunkRef(eventId, i) {
+  return doc(db, "events", eventId, "themeChunks", String(i));
+}
+
+export async function saveEventTheme(eventId, { maskColor, backgroundBase64 }) {
+  const chunkCount = Math.ceil(backgroundBase64.length / EVENT_THEME_CHUNK_SIZE);
+  const batch = writeBatch(db);
+  batch.set(doc(db, "events", eventId), { themeMaskColor: maskColor, themeChunkCount: chunkCount }, { merge: true });
+  for (let i = 0; i < chunkCount; i++) {
+    batch.set(eventThemeChunkRef(eventId, i), {
+      data: backgroundBase64.slice(i * EVENT_THEME_CHUNK_SIZE, (i + 1) * EVENT_THEME_CHUNK_SIZE),
+    });
+  }
+  await batch.commit();
+}
+
+export async function clearEventTheme(eventId) {
+  const event = await getEvent(eventId);
+  const chunkCount = event?.themeChunkCount || 0;
+  const batch = writeBatch(db);
+  batch.set(doc(db, "events", eventId), { themeMaskColor: null, themeChunkCount: 0 }, { merge: true });
+  for (let i = 0; i < chunkCount; i++) {
+    batch.delete(eventThemeChunkRef(eventId, i));
+  }
+  await batch.commit();
+}
+
+/**
+ * Charge le thème imposé d'un événement (fond + couleur), ou null si
+ * l'organisateur n'en a pas défini.
+ */
+export async function getEventTheme(eventId) {
+  const event = await getEvent(eventId);
+  if (!event?.themeChunkCount) return null;
+  const chunkSnaps = await Promise.all(
+    Array.from({ length: event.themeChunkCount }, (_, i) => getDoc(eventThemeChunkRef(eventId, i)))
+  );
+  const background = chunkSnaps.map((snap) => snap.data()?.data || "").join("");
+  return { background, maskColor: event.themeMaskColor || null };
+}
+
 /**
  * Écoute les événements créés par cet utilisateur (organisateur), pour
  * lui permettre d'accéder directement à leur tableau de bord depuis le

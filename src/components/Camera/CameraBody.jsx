@@ -27,9 +27,16 @@ function useOrientation() {
   return isLandscape ? "landscape" : "portrait";
 }
 
-export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, developingUntilMs = null, onReload = null }) {
+export default function CameraBody({
+  shotsRemaining, shotsAllowed, onCapture, developingUntilMs = null, onReload = null,
+  overrideSkin = undefined, overrideMaskColor = undefined,
+}) {
   const { videoRef, error, ready, torchSupported, applyTorch } = useCameraStream();
-  const { customSkin, maskColor } = useTheme();
+  const themeCtx = useTheme();
+  // Un événement peut imposer son propre thème (voir EventCameraPage) —
+  // dans ce cas il prime sur le thème personnel de l'invité.
+  const customSkin = overrideSkin !== undefined ? overrideSkin : themeCtx.customSkin;
+  const maskColor = overrideMaskColor !== undefined ? overrideMaskColor : themeCtx.maskColor;
   const orientation = useOrientation();
   const layout = HOTSPOTS[orientation];
 
@@ -112,12 +119,11 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
       />
 
       {/* Sur une image personnalisée uniquement : le mécanisme (boutons,
-          molette, grip) reste visible par-dessus — soit dans sa couleur
-          grise naturelle (masque affiché tel quel), soit recoloré selon
-          le thème actif (couleur appliquée via l'alpha du masque comme
-          pochoir), soit totalement absent si le thème choisit
-          "transparent" (le fond se voit alors aussi dans les boutons). */}
-      {customSkin && maskColor === "transparent" ? null : customSkin && maskColor ? (
+          molette, grip) reste visible par-dessus — recoloré si le thème
+          choisit une couleur, ou affiché tel quel dans son gris naturel
+          si le thème choisit "transparent" (= pas de teinte appliquée,
+          on laisse le gris d'origine, pas de trou dans les boutons). */}
+      {customSkin && maskColor && maskColor !== "transparent" ? (
         <div
           className="camera-body__skin-relief"
           style={{
