@@ -4,6 +4,7 @@ import FilmWheel from "./FilmWheel";
 import PoseCounter from "./PoseCounter";
 import FlashButton from "./FlashButton";
 import HamburgerMenu from "../UI/HamburgerMenu";
+import GalleryShortcut from "../UI/GalleryShortcut";
 import InstructionsOverlay from "./InstructionsOverlay";
 import DefaultThemeAnnotations from "./DefaultThemeAnnotations";
 import DevelopClock from "./DevelopClock";
@@ -190,6 +191,7 @@ export default function CameraBody({
       </div>
 
       <HamburgerMenu />
+      <GalleryShortcut />
 
       {/* Cadre "étiquette" bien visible pour le statut courant (armé,
           instructions de glissé, retour après capture…). */}

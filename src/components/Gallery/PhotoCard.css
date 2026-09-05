@@ -1,21 +1,20 @@
 .photo-card {
-  background: var(--accent-soft, #181818);
-  background-image: var(--paper-texture, none);
+  background: var(--paper-alt, #fff);
   padding: 0.6rem 0.6rem 0.8rem;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--chassis-color-dark, #000);
+  box-shadow: 0 4px 12px rgba(28, 26, 23, 0.1), 0 0 0 1px rgba(28, 26, 23, 0.04);
+  border: 1px solid var(--border-soft, rgba(0, 0, 0, 0.06));
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .photo-card:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 20px rgba(28, 26, 23, 0.14), 0 0 0 1px rgba(28, 26, 23, 0.06);
 }
 
 .photo-card:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 2px 8px rgba(28, 26, 23, 0.1), 0 0 0 1px rgba(28, 26, 23, 0.04);
 }
 
 .photo-card__frame {

@@ -1,14 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import PhotoCard from "../components/Gallery/PhotoCard";
 import Lightbox from "../components/Gallery/Lightbox";
 import {
   listenEventGuests, listenEventPhotos, getEvent, updateEvent,
-  syncGuestShotsAllowed, resetGuestRoll,
+  syncGuestShotsAllowed, resetGuestRoll, saveEventTheme, clearEventTheme,
 } from "../firebase/firestore";
+import { imageToOptimizedBase64 } from "../utils/imageCompression";
 import { downloadPhotosAsZip } from "../utils/downloadAlbum";
+import ImageCropModal from "../components/UI/ImageCropModal";
 import "./EventDashboardPage.css";
+import "./EventCreatePage.css";
 import LoadingScreen from "../components/UI/LoadingScreen";
+
+const DEFAULT_MASK_COLOR = "#8a8a8a";
 
 function toDatetimeLocalValue(timestamp) {
   if (!timestamp?.toDate) return "";
@@ -30,6 +35,14 @@ export default function EventDashboardPage() {
   const [applyToExisting, setApplyToExisting] = useState(false);
   const [busyGuestId, setBusyGuestId] = useState(null);
   const [zipProgress, setZipProgress] = useState(null);
+
+  // Thème imposé aux invités.
+  const [pendingFile, setPendingFile] = useState(null);
+  const [croppedBlob, setCroppedBlob] = useState(null);
+  const [maskColor, setMaskColor] = useState(DEFAULT_MASK_COLOR);
+  const [transparent, setTransparent] = useState(false);
+  const [savingTheme, setSavingTheme] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const unsub1 = listenEventGuests(eventId, setGuests);
@@ -85,6 +98,33 @@ export default function EventDashboardPage() {
     setBusyGuestId(guest.id);
     await resetGuestRoll(eventId, guest.id);
     setBusyGuestId(null);
+  }
+
+  function handleThemeFileSelected(e) {
+    const file = e.target.files?.[0];
+    if (file) setPendingFile(file);
+  }
+
+  async function handleSaveTheme() {
+    if (!croppedBlob) return;
+    setSavingTheme(true);
+    const optimized = await imageToOptimizedBase64(croppedBlob, 1200, 0.85);
+    await saveEventTheme(eventId, {
+      maskColor: transparent ? "transparent" : maskColor,
+      backgroundBase64: optimized,
+    });
+    const refreshed = await getEvent(eventId);
+    setEvent(refreshed);
+    setCroppedBlob(null);
+    setSavingTheme(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleClearTheme() {
+    if (!window.confirm("Retirer l'habillage imposé ? Les invités reverront leur thème personnel.")) return;
+    await clearEventTheme(eventId);
+    const refreshed = await getEvent(eventId);
+    setEvent(refreshed);
   }
 
   async function handleDownloadGuestAlbum(guest) {
@@ -173,9 +213,71 @@ export default function EventDashboardPage() {
             />
           </label>
 
-          <p className="event-dashboard__note">
-            L'habillage visuel se règle individuellement par chaque invité, dans ses propres Réglages.
-          </p>
+          <div className="event-dashboard__theme-section">
+            <p className="event-dashboard__theme-title">Habillage imposé aux invités</p>
+
+            {event.themeChunkCount > 0 && !croppedBlob ? (
+              <div className="event-dashboard__theme-current">
+                <span
+                  className="event-dashboard__theme-swatch"
+                  style={{ background: event.themeMaskColor === "transparent" ? "#8a8a8a" : event.themeMaskColor }}
+                />
+                <span>Un habillage est actuellement imposé à tous les invités.</span>
+                <button type="button" className="event-dashboard__link-btn event-dashboard__link-btn--danger" onClick={handleClearTheme}>
+                  Retirer
+                </button>
+              </div>
+            ) : (
+              <p className="event-dashboard__note">
+                Aucun habillage imposé — chaque invité utilise son thème personnel.
+              </p>
+            )}
+
+            {pendingFile && (
+              <ImageCropModal
+                file={pendingFile}
+                onConfirm={(blob) => {
+                  setCroppedBlob(blob);
+                  setPendingFile(null);
+                }}
+                onCancel={() => {
+                  setPendingFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+              />
+            )}
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleThemeFileSelected}
+              accept="image/*"
+              id="event-theme-upload"
+              style={{ display: "none" }}
+            />
+            <label htmlFor="event-theme-upload" className="event-form__upload-button">
+              {croppedBlob ? "Changer l'image" : "Choisir une nouvelle image"}
+            </label>
+
+            {croppedBlob && (
+              <>
+                <div
+                  className="event-form__theme-preview"
+                  style={{ backgroundImage: `url(${URL.createObjectURL(croppedBlob)})` }}
+                />
+                <div className="event-form__color-row">
+                  <input type="color" value={maskColor} onChange={(e) => setMaskColor(e.target.value)} disabled={transparent} />
+                  <label className="event-form__checkbox-label">
+                    <input type="checkbox" checked={transparent} onChange={(e) => setTransparent(e.target.checked)} />
+                    Garder le mécanisme gris d'origine
+                  </label>
+                </div>
+                <button type="button" className="event-dashboard__btn event-dashboard__btn--primary" onClick={handleSaveTheme} disabled={savingTheme}>
+                  {savingTheme ? "Enregistrement…" : "Appliquer cet habillage"}
+                </button>
+              </>
+            )}
+          </div>
 
           <button type="submit" className="event-dashboard__btn event-dashboard__btn--primary" disabled={saving}>
             {saving ? "Enregistrement…" : "Enregistrer les réglages"}

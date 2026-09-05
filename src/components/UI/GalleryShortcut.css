@@ -1,0 +1,25 @@
+.gallery-shortcut {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.9rem 0.6rem 0.7rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(180deg, rgba(30, 30, 30, 0.75) 0%, rgba(10, 10, 10, 0.75) 100%);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  color: var(--body-color, #f5c518);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gallery-shortcut span {
+  font-family: var(--font-display, "Poppins", sans-serif);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+}
