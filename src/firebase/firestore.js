@@ -301,67 +301,85 @@ export function listenEventPhotos(eventId, callback) {
   return onSnapshot(q, (snap) => callback(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
 }
 
-// ---------- Personnalisation utilisateur ----------
+// ---------- Thèmes personnalisés (plusieurs, nommés) ----------
+//
+// Un thème = un nom + une image de fond (le corps de l'appareil) +
+// une couleur pour le mécanisme (boutons/molette/grip, gris par
+// défaut — "transparent" est une valeur valide, qui masque le
+// mécanisme et laisse voir le fond partout).
+//
+// userThemes/{uid}                          → { activeThemeId }
+// userThemes/{uid}/themes/{themeId}         → manifeste (nom, couleur, nb morceaux)
+// userThemes/{uid}/themes/{themeId}/chunks/{i} → morceaux du fond (voir photoDataChunks)
 
-const CUSTOMIZATION_COLLECTION = "userCustomizations";
-// Taille max d'un morceau (marge sous la limite Firestore de 1 Mo). Le
-// fond personnalisé, même compressé, peut dépasser 1 Mo une fois encodé
-// en base64 — même stratégie de découpage que pour les photos.
-const CUSTOMIZATION_CHUNK_SIZE = 650_000;
+const THEME_CHUNK_SIZE = 650_000;
 
-export async function saveCustomBackground(uid, backgroundBase64) {
-  const chunkCount = Math.ceil(backgroundBase64.length / CUSTOMIZATION_CHUNK_SIZE);
-  const batch = writeBatch(db);
-  batch.set(
-    doc(db, CUSTOMIZATION_COLLECTION, uid),
-    { chunkCount, updatedAt: serverTimestamp() },
-    { merge: true }
-  );
-  for (let i = 0; i < chunkCount; i++) {
-    batch.set(
-      doc(db, CUSTOMIZATION_COLLECTION, uid, "chunks", String(i)),
-      { data: backgroundBase64.slice(i * CUSTOMIZATION_CHUNK_SIZE, (i + 1) * CUSTOMIZATION_CHUNK_SIZE) }
-    );
-  }
-  await batch.commit();
+function themeChunkRef(uid, themeId, i) {
+  return doc(db, "userThemes", uid, "themes", themeId, "chunks", String(i));
 }
 
-async function loadCustomBackgroundChunks(uid, chunkCount) {
+/**
+ * Crée un nouveau thème nommé. Retourne son identifiant.
+ */
+export async function saveTheme(uid, { name, maskColor, backgroundBase64 }) {
+  const themeRef = doc(collection(db, "userThemes", uid, "themes"));
+  const chunkCount = Math.ceil(backgroundBase64.length / THEME_CHUNK_SIZE);
+  const batch = writeBatch(db);
+  batch.set(themeRef, { name, maskColor, chunkCount, createdAt: serverTimestamp() });
+  for (let i = 0; i < chunkCount; i++) {
+    batch.set(themeChunkRef(uid, themeRef.id, i), {
+      data: backgroundBase64.slice(i * THEME_CHUNK_SIZE, (i + 1) * THEME_CHUNK_SIZE),
+    });
+  }
+  await batch.commit();
+  return themeRef.id;
+}
+
+/**
+ * Écoute la liste des thèmes de l'utilisateur (métadonnées seulement —
+ * nom, couleur — jamais le fond, trop lourd pour une simple liste).
+ */
+export function listenMyThemes(uid, callback) {
+  return onSnapshot(collection(db, "userThemes", uid, "themes"), (snap) => {
+    callback(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+  });
+}
+
+/**
+ * Charge le fond (lourd) d'un thème précis, à la demande — jamais en
+ * temps réel, uniquement quand ce thème doit réellement s'afficher.
+ */
+export async function getThemeBackground(uid, themeId, chunkCount) {
   if (!chunkCount) return null;
   const chunkSnaps = await Promise.all(
-    Array.from({ length: chunkCount }, (_, i) => getDoc(doc(db, CUSTOMIZATION_COLLECTION, uid, "chunks", String(i))))
+    Array.from({ length: chunkCount }, (_, i) => getDoc(themeChunkRef(uid, themeId, i)))
   );
   return chunkSnaps.map((snap) => snap.data()?.data || "").join("");
 }
 
-export async function getCustomBackground(uid) {
-  const snap = await getDoc(doc(db, CUSTOMIZATION_COLLECTION, uid));
-  if (!snap.exists()) return null;
-  return loadCustomBackgroundChunks(uid, snap.data().chunkCount);
+export async function deleteTheme(uid, themeId, chunkCount) {
+  const batch = writeBatch(db);
+  batch.delete(doc(db, "userThemes", uid, "themes", themeId));
+  for (let i = 0; i < (chunkCount || 0); i++) {
+    batch.delete(themeChunkRef(uid, themeId, i));
+  }
+  await batch.commit();
 }
 
 /**
- * Écoute le manifeste (léger) en temps réel ; recharge les morceaux
- * (plus lourds, pas en temps réel) uniquement quand le manifeste change.
+ * Définit le thème actif (ou revient au thème par défaut si themeId
+ * est null).
  */
-export function listenToCustomization(uid, callback) {
-  return onSnapshot(doc(db, CUSTOMIZATION_COLLECTION, uid), async (snap) => {
-    if (!snap.exists() || !snap.data().chunkCount) {
-      callback(null);
-      return;
-    }
-    const background = await loadCustomBackgroundChunks(uid, snap.data().chunkCount);
-    callback({ background });
-  });
+export async function setActiveTheme(uid, themeId) {
+  await setDoc(doc(db, "userThemes", uid), { activeThemeId: themeId }, { merge: true });
 }
 
-export async function deleteCustomBackground(uid) {
-  const snap = await getDoc(doc(db, CUSTOMIZATION_COLLECTION, uid));
-  const chunkCount = snap.exists() ? snap.data().chunkCount || 0 : 0;
-  const batch = writeBatch(db);
-  batch.set(doc(db, CUSTOMIZATION_COLLECTION, uid), { chunkCount: 0 }, { merge: true });
-  for (let i = 0; i < chunkCount; i++) {
-    batch.delete(doc(db, CUSTOMIZATION_COLLECTION, uid, "chunks", String(i)));
-  }
-  await batch.commit();
+/**
+ * Écoute quel thème est actif — léger, ne charge pas le fond associé
+ * (à faire séparément avec getThemeBackground une fois l'id connu).
+ */
+export function listenActiveThemeId(uid, callback) {
+  return onSnapshot(doc(db, "userThemes", uid), (snap) => {
+    callback(snap.exists() ? snap.data().activeThemeId || null : null);
+  });
 }

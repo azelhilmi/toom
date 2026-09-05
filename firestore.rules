@@ -98,15 +98,20 @@ service cloud.firestore {
     // silencieusement par le refus par défaut de Firestore, ce qui
     // cassait le customisateur pour tout le monde sans message d'erreur
     // visible côté interface.
-    match /userCustomizations/{uid} {
+    // userThemes/{uid} : plusieurs thèmes nommés par utilisateur (fond +
+    // couleur du mécanisme). Chacun ne gère que ses propres documents.
+    match /userThemes/{uid} {
       allow read: if isSignedIn();
       allow write: if isSignedIn() && request.auth.uid == uid;
 
-      // Morceaux du fond personnalisé (même limite de 1 Mo/document que
-      // pour les photos — voir photoDataChunks ci-dessus).
-      match /chunks/{chunkId} {
+      match /themes/{themeId} {
         allow read: if isSignedIn();
         allow write: if isSignedIn() && request.auth.uid == uid;
+
+        match /chunks/{chunkId} {
+          allow read: if isSignedIn();
+          allow write: if isSignedIn() && request.auth.uid == uid;
+        }
       }
     }
 

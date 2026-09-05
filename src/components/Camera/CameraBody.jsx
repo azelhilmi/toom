@@ -29,7 +29,7 @@ function useOrientation() {
 
 export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, developingUntilMs = null, onReload = null }) {
   const { videoRef, error, ready, torchSupported, applyTorch } = useCameraStream();
-  const { customSkin } = useTheme();
+  const { customSkin, maskColor } = useTheme();
   const orientation = useOrientation();
   const layout = HOTSPOTS[orientation];
 
@@ -112,23 +112,39 @@ export default function CameraBody({ shotsRemaining, shotsAllowed, onCapture, de
       />
 
       {/* Sur une image personnalisée uniquement : le mécanisme (boutons,
-          molette, grip) reste fixe et gris — il est dessiné dans le
-          masque d'origine, qui est déjà transparent partout ailleurs
-          (corps ET fenêtres), donc superposable tel quel sans traitement
-          particulier. */}
-      {customSkin && (
-        <img
+          molette, grip) reste visible par-dessus — soit dans sa couleur
+          grise naturelle (masque affiché tel quel), soit recoloré selon
+          le thème actif (couleur appliquée via l'alpha du masque comme
+          pochoir), soit totalement absent si le thème choisit
+          "transparent" (le fond se voit alors aussi dans les boutons). */}
+      {customSkin && maskColor === "transparent" ? null : customSkin && maskColor ? (
+        <div
           className="camera-body__skin-relief"
-          src={layout.mask}
-          alt=""
-          draggable={false}
+          style={{
+            backgroundColor: maskColor,
+            WebkitMaskImage: `url(${layout.mask})`,
+            maskImage: `url(${layout.mask})`,
+            WebkitMaskSize: "100% 100%",
+            maskSize: "100% 100%",
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+          }}
         />
+      ) : (
+        customSkin && (
+          <img
+            className="camera-body__skin-relief"
+            src={layout.mask}
+            alt=""
+            draggable={false}
+          />
+        )
       )}
 
       {/* Sur le thème par défaut uniquement : léger grain texturé pour
           casser l'aplat de couleur, qui paraissait un peu vide/plat. */}
       {!customSkin && <div className="camera-body__default-texture" aria-hidden="true" />}
-      {!customSkin && <DefaultThemeAnnotations layout={layout} />}
+      <DefaultThemeAnnotations layout={layout} />
 
       {/* Couche 3 : zones fonctionnelles transparentes, superposées
           exactement à l'endroit où l'image dessine chaque contrôle. */}

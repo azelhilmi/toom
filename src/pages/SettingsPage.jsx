@@ -2,56 +2,87 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
-import { saveCustomBackground, deleteCustomBackground } from "../firebase/firestore";
+import { saveTheme, deleteTheme, setActiveTheme } from "../firebase/firestore";
 import { imageToOptimizedBase64 } from "../utils/imageCompression";
 import InstallAppCard from "../components/UI/InstallAppCard";
 import ImageCropModal from "../components/UI/ImageCropModal";
 import "./SettingsPage.css";
 
+const DEFAULT_MASK_COLOR = "#8a8a8a";
+
 export default function SettingsPage() {
-  const { customSkin, setCustomSkin } = useTheme();
+  const { activeThemeId, myThemes } = useTheme();
   const { user } = useAuth();
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState(null);
+
+  const [creating, setCreating] = useState(false);
   const [pendingFile, setPendingFile] = useState(null);
+  const [croppedBlob, setCroppedBlob] = useState(null);
+  const [themeName, setThemeName] = useState("");
+  const [maskColor, setMaskColor] = useState(DEFAULT_MASK_COLOR);
+  const [transparent, setTransparent] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
   function handleFileSelected(e) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setUploadError("Sélectionne une image.");
+      setError("Sélectionne une image.");
       return;
     }
-    setUploadError(null);
-    // Ouvre la modale de recadrage/rotation avant tout traitement.
+    setError(null);
     setPendingFile(file);
   }
 
-  async function handleCropConfirm(croppedBlob) {
+  function handleCropConfirm(blob) {
     setPendingFile(null);
-    setIsUploading(true);
-    setUploadError(null);
+    setCroppedBlob(blob);
+  }
+
+  async function handleSaveTheme(e) {
+    e.preventDefault();
+    if (!croppedBlob || !themeName.trim()) return;
+    setIsSaving(true);
+    setError(null);
     try {
       // Compression automatique à la volée, quelle que soit la taille
-      // d'origine — une photo de téléphone (souvent plusieurs Mo) est
-      // toujours acceptée, jamais rejetée pour être "trop grosse".
+      // d'origine — jamais rejetée pour être "trop grosse".
       const optimized = await imageToOptimizedBase64(croppedBlob, 1200, 0.85);
-      await saveCustomBackground(user.uid, optimized);
-      setCustomSkin(optimized);
+      const themeId = await saveTheme(user.uid, {
+        name: themeName.trim(),
+        maskColor: transparent ? "transparent" : maskColor,
+        backgroundBase64: optimized,
+      });
+      await setActiveTheme(user.uid, themeId);
+      resetCreationForm();
     } catch (err) {
-      console.error("Erreur upload skin:", err);
-      setUploadError(err?.message || "Échec du traitement de l'image.");
+      console.error("Erreur sauvegarde thème:", err);
+      setError(err?.message || "Échec de la sauvegarde du thème.");
     } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      setIsSaving(false);
     }
   }
 
-  async function handleRemove() {
-    if (!user?.uid) return;
-    await deleteCustomBackground(user.uid);
-    setCustomSkin(null);
+  function resetCreationForm() {
+    setCreating(false);
+    setCroppedBlob(null);
+    setThemeName("");
+    setMaskColor(DEFAULT_MASK_COLOR);
+    setTransparent(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleSelectTheme(themeId) {
+    await setActiveTheme(user.uid, themeId);
+  }
+
+  async function handleDeleteTheme(theme) {
+    if (!window.confirm(`Supprimer le thème "${theme.name}" ?`)) return;
+    await deleteTheme(user.uid, theme.id, theme.chunkCount);
+    if (activeThemeId === theme.id) {
+      await setActiveTheme(user.uid, null);
+    }
   }
 
   return (
@@ -82,47 +113,118 @@ export default function SettingsPage() {
       </section>
 
       <section className="settings-page__section">
-        <h2>Habillage de l'appareil</h2>
+        <h2>Thèmes</h2>
         <p className="settings-page__hint">
-          Remplace l'habillage jaune par défaut par une image de ton choix —
-          elle s'adapte automatiquement à ton écran, en portrait comme en
-          paysage. N'importe quelle photo convient, elle est compressée
-          automatiquement. Tu pourras la recadrer et la faire pivoter avant
-          de valider.
+          Un thème = une image de fond + une couleur pour le mécanisme
+          (boutons, molette). Crée-en autant que tu veux, donne-leur un nom,
+          et bascule de l'un à l'autre à tout moment.
         </p>
 
-        <div className="settings-page__upload">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelected}
-            accept="image/*"
-            disabled={isUploading}
-            className="settings-page__file-input"
-            id="skin-upload"
-          />
-          <label htmlFor="skin-upload" className="settings-page__upload-button">
-            {isUploading ? "Traitement…" : customSkin ? "Changer l'image" : "Choisir une image"}
-          </label>
+        <div className="theme-list">
+          <button
+            type="button"
+            className={`theme-list__item ${!activeThemeId ? "theme-list__item--active" : ""}`}
+            onClick={() => handleSelectTheme(null)}
+          >
+            <span className="theme-list__swatch theme-list__swatch--default" />
+            <span className="theme-list__name">Thème par défaut</span>
+            {!activeThemeId && <span className="theme-list__badge">Actif</span>}
+          </button>
 
-          {customSkin && (
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="settings-page__remove-button"
-              disabled={isUploading}
-            >
-              Revenir au thème par défaut
-            </button>
-          )}
+          {myThemes.map((theme) => (
+            <div key={theme.id} className={`theme-list__item ${activeThemeId === theme.id ? "theme-list__item--active" : ""}`}>
+              <button type="button" className="theme-list__select" onClick={() => handleSelectTheme(theme.id)}>
+                <span
+                  className="theme-list__swatch"
+                  style={{ background: theme.maskColor === "transparent" ? "transparent" : theme.maskColor }}
+                />
+                <span className="theme-list__name">{theme.name}</span>
+                {activeThemeId === theme.id && <span className="theme-list__badge">Actif</span>}
+              </button>
+              <button
+                type="button"
+                className="theme-list__delete"
+                onClick={() => handleDeleteTheme(theme)}
+                aria-label={`Supprimer ${theme.name}`}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
         </div>
 
-        {uploadError && <p className="settings-page__error">{uploadError}</p>}
+        {!creating ? (
+          <button type="button" className="settings-page__new-theme" onClick={() => setCreating(true)}>
+            + Nouveau thème
+          </button>
+        ) : (
+          <form className="theme-create" onSubmit={handleSaveTheme}>
+            <label className="theme-create__field">
+              Nom du thème
+              <input
+                type="text"
+                value={themeName}
+                onChange={(e) => setThemeName(e.target.value)}
+                placeholder="Ex. Vacances d'été"
+                required
+              />
+            </label>
 
-        {customSkin && (
-          <div className="settings-page__preview">
-            <div className="settings-page__preview-image" style={{ backgroundImage: `url(${customSkin})` }} />
-          </div>
+            <label className="theme-create__field">
+              Image de fond
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelected}
+                accept="image/*"
+                className="settings-page__file-input"
+                id="theme-image-upload"
+              />
+              <label htmlFor="theme-image-upload" className="settings-page__upload-button">
+                {croppedBlob ? "Changer l'image" : "Choisir une image"}
+              </label>
+            </label>
+
+            {croppedBlob && (
+              <div className="settings-page__preview">
+                <div
+                  className="settings-page__preview-image"
+                  style={{ backgroundImage: `url(${URL.createObjectURL(croppedBlob)})` }}
+                />
+              </div>
+            )}
+
+            <label className="theme-create__field">
+              Couleur du mécanisme (boutons, molette)
+              <div className="theme-create__color-row">
+                <input
+                  type="color"
+                  value={maskColor}
+                  onChange={(e) => setMaskColor(e.target.value)}
+                  disabled={transparent}
+                />
+                <label className="theme-create__checkbox">
+                  <input
+                    type="checkbox"
+                    checked={transparent}
+                    onChange={(e) => setTransparent(e.target.checked)}
+                  />
+                  Transparent (laisse voir le fond partout)
+                </label>
+              </div>
+            </label>
+
+            {error && <p className="settings-page__error">{error}</p>}
+
+            <div className="theme-create__actions">
+              <button type="button" className="theme-create__cancel" onClick={resetCreationForm} disabled={isSaving}>
+                Annuler
+              </button>
+              <button type="submit" disabled={isSaving || !croppedBlob || !themeName.trim()}>
+                {isSaving ? "Sauvegarde…" : "Enregistrer le thème"}
+              </button>
+            </div>
+          </form>
         )}
       </section>
     </div>
