@@ -22,8 +22,8 @@ export const HOTSPOTS = {
     mask: "/skins/mask-horizontal.webp",
     windowsCutout: "/skins/windows-cutout-horizontal.webp",
     wheelAxis: "horizontal", // glissé gauche→droite
-    viewfinder: { x: 47.6, y: 10.4, w: 7.7, h: 13 },
-    poseCounter: { x: 75.4, y: 65.5, w: 5.7, h: 7.5 },
+    viewfinder: { x: 47.7, y: 10.9, w: 4.6, h: 7.4 },
+    poseCounter: { x: 75.4, y: 65.3, w: 5.7, h: 7.5 },
     flashButton: { x: 71, y: 12.3, w: 9.3, h: 9.3 },
     // Zone de clic élargie mais modérée (l'agrandissement précédent
     // grignotait trop l'espace disponible pour les instructions).
@@ -40,8 +40,8 @@ export const HOTSPOTS = {
     mask: "/skins/mask-vertical.webp",
     windowsCutout: "/skins/windows-cutout-vertical.webp",
     wheelAxis: "vertical", // glissé haut→bas
-    viewfinder: { x: 49.9, y: 7.6, w: 14.1, h: 6.1 },
-    poseCounter: { x: 85.4, y: 82.9, w: 9.4, h: 3.7 },
+    viewfinder: { x: 49.9, y: 7.6, w: 9.7, h: 4.1 },
+    poseCounter: { x: 85.3, y: 82.6, w: 9.7, h: 3.9 },
     flashButton: { x: 84.6, y: 26.2, w: 14, h: 14 },
     shutter: { x: 48.9, y: 73.3, w: 20, h: 20 },
     filmWheel: { x: 89.9, y: 8.9, w: 10, h: 18 },
