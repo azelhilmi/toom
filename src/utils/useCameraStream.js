@@ -18,12 +18,14 @@ export function useCameraStream() {
   const [error, setError] = useState(null);
   const [ready, setReady] = useState(false);
   const [torchSupported, setTorchSupported] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let stream;
     let cancelled = false;
 
     async function start() {
+      setError(null);
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: "environment" } },
@@ -50,7 +52,7 @@ export function useCameraStream() {
       } catch (err) {
         setError(
           err.name === "NotAllowedError"
-            ? "Accès à la caméra refusé. Autorise-le dans les réglages du navigateur."
+            ? "Accès à la caméra refusé. Autorise-le dans les réglages du navigateur, puis réessaie."
             : "Impossible d'accéder à la caméra sur cet appareil."
         );
       }
@@ -61,6 +63,11 @@ export function useCameraStream() {
       cancelled = true;
       if (stream) stream.getTracks().forEach((t) => t.stop());
     };
+  }, [attempt]);
+
+  const retry = useCallback(() => {
+    setReady(false);
+    setAttempt((n) => n + 1);
   }, []);
 
   const applyTorch = useCallback((enabled) => {
@@ -72,5 +79,5 @@ export function useCameraStream() {
       .catch(() => false);
   }, []);
 
-  return { videoRef, error, ready, torchSupported, applyTorch };
+  return { videoRef, error, ready, torchSupported, applyTorch, retry };
 }

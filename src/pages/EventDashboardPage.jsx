@@ -11,7 +11,7 @@ import { imageToOptimizedBase64 } from "../utils/imageCompression";
 import { downloadPhotosAsZip } from "../utils/downloadAlbum";
 import ImageCropModal from "../components/UI/ImageCropModal";
 import "./EventDashboardPage.css";
-import "./EventCreatePage.css";
+import "../styles/eventThemeForm.css";
 import LoadingScreen from "../components/UI/LoadingScreen";
 
 const DEFAULT_MASK_COLOR = "#8a8a8a";

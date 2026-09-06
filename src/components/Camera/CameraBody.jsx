@@ -31,7 +31,7 @@ export default function CameraBody({
   shotsRemaining, shotsAllowed, onCapture, developingUntilMs = null, onReload = null,
   overrideSkin = undefined, overrideMaskColor = undefined,
 }) {
-  const { videoRef, error, ready, torchSupported, applyTorch } = useCameraStream();
+  const { videoRef, error, ready, torchSupported, applyTorch, retry } = useCameraStream();
   const themeCtx = useTheme();
   // Un événement peut imposer son propre thème (voir EventCameraPage) —
   // dans ce cas il prime sur le thème personnel de l'invité.
@@ -87,7 +87,7 @@ export default function CameraBody({
       {/* Couche 1 : viseur et compte-poses, révélés à travers les vraies
           zones transparentes de l'image du boîtier posée par-dessus. */}
       <div className="camera-body__viewfinder-slot" style={hotspotStyle(layout.viewfinder)}>
-        <Viewfinder videoRef={videoRef} error={error} flashPulse={flashPulse} fill />
+        <Viewfinder videoRef={videoRef} error={error} flashPulse={flashPulse} retry={retry} fill />
       </div>
       <div className="camera-body__pose-slot" style={hotspotStyle(layout.poseCounter)}>
         <PoseCounter remaining={Math.max(shotsRemaining, 0)} total={shotsAllowed} bare />

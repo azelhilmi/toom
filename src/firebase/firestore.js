@@ -5,6 +5,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./init";
 import { captureFrameAsBase64 } from "../utils/imageCompression";
+import { canReuseRoll } from "../utils/rollLogic";
 
 const DAILY_SHOTS = 24;
 const REVEAL_DELAY_MS = 24 * 60 * 60 * 1000;
@@ -32,14 +33,11 @@ export async function getOrCreateActiveRoll(uid, theme = "kodak-funsaver") {
   if (!snap.empty) {
     const existing = snap.docs[0];
     const data = existing.data();
-    const isDeveloped = data.revealAt ? data.revealAt.toMillis() <= Date.now() : false;
     // Tant que la pellicule n'a pas atteint sa date de révélation, on
     // continue de l'utiliser (pleine ou non). Une fois développée, on
-    // repart sur une neuve dans tous les cas — sinon une photo prise
-    // longtemps après coup sur une pellicule jamais remplie hériterait
-    // d'une date de révélation déjà dépassée et s'afficherait
-    // immédiatement, sans les 24h d'attente.
-    if (!isDeveloped) {
+    // repart sur une neuve dans tous les cas — voir canReuseRoll pour
+    // le pourquoi (et ses tests dans rollLogic.test.js).
+    if (canReuseRoll(data, Date.now())) {
       return existing.id;
     }
   }

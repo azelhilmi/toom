@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { listenMyEvents } from "../../firebase/firestore";
@@ -41,16 +41,32 @@ export default function HamburgerMenu() {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const [myEvents, setMyEvents] = useState([]);
+  const closeButtonRef = useRef(null);
+  const triggerButtonRef = useRef(null);
 
   useEffect(() => {
     if (!user?.uid) return;
     return listenMyEvents(user.uid, setMyEvents);
   }, [user?.uid]);
 
+  useEffect(() => {
+    if (!open) return;
+    closeButtonRef.current?.focus();
+    function handleKeyDown(e) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      triggerButtonRef.current?.focus();
+    };
+  }, [open]);
+
   return (
     <div className="hamburger-menu">
       <button
         type="button"
+        ref={triggerButtonRef}
         className={`hamburger-menu__button ${open ? "hamburger-menu__button--open" : ""}`}
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
@@ -62,12 +78,19 @@ export default function HamburgerMenu() {
       </button>
 
       {open && (
-        <div className="hamburger-modal" onClick={() => setOpen(false)}>
+        <div
+          className="hamburger-modal"
+          onClick={() => setOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu de navigation"
+        >
           <div className="hamburger-modal__sheet" onClick={(e) => e.stopPropagation()}>
             <div className="hamburger-modal__header">
               <img src="/brand/icon-round.webp" alt="Toom" className="hamburger-modal__logo" />
               <button
                 type="button"
+                ref={closeButtonRef}
                 className="hamburger-modal__close"
                 onClick={() => setOpen(false)}
                 aria-label="Fermer"

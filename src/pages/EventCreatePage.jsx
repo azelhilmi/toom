@@ -6,6 +6,7 @@ import { imageToOptimizedBase64 } from "../utils/imageCompression";
 import { generateInviteQrCode } from "../utils/qrCode";
 import ImageCropModal from "../components/UI/ImageCropModal";
 import "./EventCreatePage.css";
+import "../styles/eventThemeForm.css";
 
 const DEFAULT_MASK_COLOR = "#8a8a8a";
 
