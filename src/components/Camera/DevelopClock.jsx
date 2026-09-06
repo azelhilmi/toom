@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./DevelopClock.css";
 
 function formatCountdown(ms) {
@@ -9,6 +9,8 @@ function formatCountdown(ms) {
   return `${h} h ${String(m).padStart(2, "0")}`;
 }
 
+const canNotify = typeof window !== "undefined" && "Notification" in window;
+
 /**
  * Petite horloge analogique "easter egg" affichée quand la pellicule
  * est épuisée. Les aiguilles pointent l'heure RÉELLE de développement
@@ -18,11 +20,40 @@ function formatCountdown(ms) {
  */
 export default function DevelopClock({ targetMs, ready, onReload }) {
   const [now, setNow] = useState(Date.now());
+  const [notifyArmed, setNotifyArmed] = useState(
+    () => canNotify && Notification.permission === "granted"
+  );
+  const notified = useRef(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 15_000);
     return () => clearInterval(id);
   }, []);
+
+  // Notification locale au franchissement de l'heure de développement —
+  // fonctionne tant qu'un onglet de l'app reste ouvert (même en arrière-
+  // plan). Pas de vrai push serveur possible sans Cloud Functions
+  // (plan gratuit), donc rien ne se passe si l'app est totalement fermée.
+  useEffect(() => {
+    if (notifyArmed && now >= targetMs && !notified.current) {
+      notified.current = true;
+      try {
+        new Notification("Ta pellicule est développée 📸", {
+          body: "Reviens sur Toom pour découvrir tes photos.",
+          icon: "/brand/icon-192.png",
+        });
+      } catch {
+        // Silencieux : certains navigateurs (iOS notamment) restreignent
+        // la construction directe même une fois la permission accordée.
+      }
+    }
+  }, [notifyArmed, now, targetMs]);
+
+  async function handleEnableNotify() {
+    if (!canNotify) return;
+    const permission = await Notification.requestPermission();
+    setNotifyArmed(permission === "granted");
+  }
 
   const target = new Date(targetMs);
   const hourAngle = ((target.getHours() % 12) + target.getMinutes() / 60) * 30;
@@ -62,7 +93,15 @@ export default function DevelopClock({ targetMs, ready, onReload }) {
           </button>
         </>
       ) : (
-        <p className="develop-clock__label">Développement dans {formatCountdown(targetMs - now)}</p>
+        <>
+          <p className="develop-clock__label">Développement dans {formatCountdown(targetMs - now)}</p>
+          {canNotify && !notifyArmed && (
+            <button type="button" className="develop-clock__notify" onClick={handleEnableNotify}>
+              🔔 Me prévenir
+            </button>
+          )}
+          {notifyArmed && <p className="develop-clock__notify-armed">🔔 Tu seras prévenu</p>}
+        </>
       )}
     </div>
   );
