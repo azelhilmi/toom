@@ -26,12 +26,68 @@
   cursor: pointer;
 }
 
+.lightbox__counter {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  color: #ccc;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.lightbox__stage {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: pan-y;
+}
+
 .lightbox__img {
   max-width: 100%;
   max-height: 72vh;
   object-fit: contain;
   border-radius: 4px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s ease;
+  user-select: none;
+}
+
+.lightbox__loading {
+  color: #999;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 4rem 0;
+}
+
+.lightbox__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lightbox__nav--prev {
+  left: 0.5rem;
+}
+
+.lightbox__nav--next {
+  right: 0.5rem;
 }
 
 .lightbox__actions {
@@ -49,6 +105,11 @@
   font-family: var(--font-body);
   font-size: 0.85rem;
   cursor: pointer;
+}
+
+.lightbox__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .lightbox__button--primary {

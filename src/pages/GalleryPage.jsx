@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import Gallery from "../components/Gallery/Gallery";
 import { useAuth } from "../context/AuthContext";
 import { listenToPhotos } from "../firebase/firestore";
 import { downloadPhotosAsZip } from "../utils/downloadAlbum";
 import "./GalleryPage.css";
 import LoadingScreen from "../components/UI/LoadingScreen";
+import BackToCameraButton from "../components/UI/BackToCameraButton";
 
 export default function GalleryPage() {
   const { user, ready } = useAuth();
@@ -39,7 +39,7 @@ export default function GalleryPage() {
           <h1>Labo Photo</h1>
           <p>Vos souvenirs, développés.</p>
         </div>
-        <Link to="/" className="gallery-page__back">Appareil</Link>
+        <BackToCameraButton />
       </header>
 
       {photos.length > 0 && (

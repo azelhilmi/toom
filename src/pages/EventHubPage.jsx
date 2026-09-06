@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { listenMyEvents } from "../firebase/firestore";
 import "./EventHubPage.css";
+import BackToCameraButton from "../components/UI/BackToCameraButton";
 
 export default function EventHubPage() {
   const { user } = useAuth();
@@ -55,7 +56,7 @@ export default function EventHubPage() {
         </div>
       )}
 
-      <Link to="/" className="event-hub__back">Retour à l'appareil</Link>
+      <BackToCameraButton />
     </div>
   );
 }

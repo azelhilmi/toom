@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getEventByInviteCode } from "../firebase/firestore";
 import "./EventCreatePage.css";
+import BackToCameraButton from "../components/UI/BackToCameraButton";
 
 export default function JoinByCodePage() {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export default function JoinByCodePage() {
 
   return (
     <form className="event-form" onSubmit={handleSubmit}>
+      <BackToCameraButton />
       <h2>Rejoindre un événement</h2>
       <p>Saisis le code communiqué par l'organisateur.</p>
       <label>

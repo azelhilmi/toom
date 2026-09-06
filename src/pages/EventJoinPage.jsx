@@ -4,6 +4,7 @@ import { setDisplayName } from "../firebase/auth";
 import { getEventByInviteCode, joinEvent } from "../firebase/firestore";
 import "./EventCreatePage.css";
 import LoadingScreen from "../components/UI/LoadingScreen";
+import BackToCameraButton from "../components/UI/BackToCameraButton";
 
 export default function EventJoinPage() {
   const { inviteCode } = useParams();
@@ -30,6 +31,7 @@ export default function EventJoinPage() {
 
   return (
     <form className="event-form" onSubmit={handleSubmit}>
+      <BackToCameraButton />
       <h2>{event.name}</h2>
       <p>Tu es invité·e à immortaliser ce moment avec un appareil jetable virtuel. Tes photos seront révélées le jour J.</p>
       <label>

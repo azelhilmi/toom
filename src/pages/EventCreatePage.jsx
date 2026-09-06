@@ -7,6 +7,7 @@ import { generateInviteQrCode } from "../utils/qrCode";
 import ImageCropModal from "../components/UI/ImageCropModal";
 import "./EventCreatePage.css";
 import "../styles/eventThemeForm.css";
+import BackToCameraButton from "../components/UI/BackToCameraButton";
 
 const DEFAULT_MASK_COLOR = "#8a8a8a";
 
@@ -62,6 +63,7 @@ export default function EventCreatePage() {
     const inviteUrl = `${window.location.origin}/invite/${result.inviteCode}`;
     return (
       <div className="event-form">
+        <BackToCameraButton />
         <h2>Événement créé</h2>
         <p>Partage ce lien à tes invités :</p>
         <input readOnly value={inviteUrl} className="event-form__invite" onFocus={(e) => e.target.select()} />
@@ -85,6 +87,7 @@ export default function EventCreatePage() {
 
   return (
     <>
+      <BackToCameraButton />
       {pendingFile && (
         <ImageCropModal
           file={pendingFile}

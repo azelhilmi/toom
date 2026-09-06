@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 import { saveTheme, deleteTheme, setActiveTheme } from "../firebase/firestore";
@@ -7,6 +6,7 @@ import { imageToOptimizedBase64 } from "../utils/imageCompression";
 import InstallAppCard from "../components/UI/InstallAppCard";
 import ImageCropModal from "../components/UI/ImageCropModal";
 import "./SettingsPage.css";
+import BackToCameraButton from "../components/UI/BackToCameraButton";
 
 const DEFAULT_MASK_COLOR = "#8a8a8a";
 
@@ -104,7 +104,7 @@ export default function SettingsPage() {
           <h1>Réglages</h1>
           <p>Personnalise l'apparence de ton appareil.</p>
         </div>
-        <Link to="/" className="settings-page__back">Appareil</Link>
+        <BackToCameraButton />
       </header>
 
       <section className="settings-page__section">

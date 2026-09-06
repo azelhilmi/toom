@@ -13,6 +13,7 @@ import ImageCropModal from "../components/UI/ImageCropModal";
 import "./EventDashboardPage.css";
 import "../styles/eventThemeForm.css";
 import LoadingScreen from "../components/UI/LoadingScreen";
+import BackToCameraButton from "../components/UI/BackToCameraButton";
 
 const DEFAULT_MASK_COLOR = "#8a8a8a";
 
@@ -30,7 +31,8 @@ export default function EventDashboardPage() {
   const [guests, setGuests] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [now, setNow] = useState(Date.now());
-  const [openPhoto, setOpenPhoto] = useState(null);
+  const [openItems, setOpenItems] = useState(null);
+  const [openIndex, setOpenIndex] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -165,6 +167,7 @@ export default function EventDashboardPage() {
 
   return (
     <div className="event-dashboard">
+      <BackToCameraButton />
       <header className="event-dashboard__header">
         <div>
           <h2>{event.name}</h2>
@@ -333,28 +336,42 @@ export default function EventDashboardPage() {
               </div>
             </div>
             <div className="event-dashboard__grid">
-              {guestPhotos.map((photo, i) => (
-                <PhotoCard
-                  key={photo.id}
-                  photo={photo}
-                  index={guestPhotos.length - 1 - i}
-                  now={now}
-                  onOpen={setOpenPhoto}
-                />
-              ))}
+              {guestPhotos.map((photo, i) => {
+                const revealedGuestItems = guestPhotos
+                  .map((p, j) => ({ photo: p, label: String(guestPhotos.length - j).padStart(2, "0") }))
+                  .filter(({ photo: p }) => {
+                    const revealAtMs = p.revealAt?.toMillis ? p.revealAt.toMillis() : 0;
+                    return now >= revealAtMs;
+                  })
+                  .map(({ photo: p, label }) => ({ id: p.id, label }));
+                return (
+                  <PhotoCard
+                    key={photo.id}
+                    photo={photo}
+                    index={guestPhotos.length - 1 - i}
+                    now={now}
+                    onOpen={(item) => {
+                      const idx = revealedGuestItems.findIndex((it) => it.id === item.id);
+                      setOpenItems(revealedGuestItems);
+                      setOpenIndex(idx === -1 ? 0 : idx);
+                    }}
+                  />
+                );
+              })}
             </div>
           </section>
         );
       })}
 
-      {openPhoto && (
+      {openItems && (
         <Lightbox
-          url={openPhoto.url}
-          filename={openPhoto.filename}
-          onClose={() => setOpenPhoto(null)}
-          onDelete={async () => {
-            await deletePhoto(openPhoto.id);
-            setOpenPhoto(null);
+          items={openItems}
+          index={openIndex}
+          onNavigate={setOpenIndex}
+          onClose={() => setOpenItems(null)}
+          onDelete={async (photoId) => {
+            await deletePhoto(photoId);
+            setOpenItems(null);
           }}
         />
       )}
