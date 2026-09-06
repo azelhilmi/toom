@@ -7,6 +7,7 @@ import InstallAppCard from "../components/UI/InstallAppCard";
 import ImageCropModal from "../components/UI/ImageCropModal";
 import "./SettingsPage.css";
 import BackToCameraButton from "../components/UI/BackToCameraButton";
+import { resetOnboarding } from "../utils/onboarding";
 
 const DEFAULT_MASK_COLOR = "#8a8a8a";
 
@@ -22,6 +23,7 @@ export default function SettingsPage() {
   const [transparent, setTransparent] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [tutorialResetDone, setTutorialResetDone] = useState(false);
   const fileInputRef = useRef(null);
 
   function handleFileSelected(e) {
@@ -110,6 +112,27 @@ export default function SettingsPage() {
       <section className="settings-page__section">
         <h2>Installer l'application</h2>
         <InstallAppCard />
+      </section>
+
+      <section className="settings-page__section">
+        <h2>Aide</h2>
+        <p className="settings-page__hint">
+          Le petit didacticiel montré au premier lancement (molette, viseur,
+          flash, déclencheur) t'a échappé, ou tu veux juste le revoir ?
+        </p>
+        <button
+          type="button"
+          className="settings-page__upload-button"
+          onClick={() => {
+            resetOnboarding();
+            setTutorialResetDone(true);
+          }}
+        >
+          Revoir le didacticiel
+        </button>
+        {tutorialResetDone && (
+          <p className="settings-page__hint">Il réapparaîtra à ta prochaine ouverture de l'appareil.</p>
+        )}
       </section>
 
       <section className="settings-page__section">

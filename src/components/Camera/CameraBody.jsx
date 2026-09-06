@@ -7,9 +7,12 @@ import HamburgerMenu from "../UI/HamburgerMenu";
 import GalleryShortcut from "../UI/GalleryShortcut";
 import InstructionsOverlay from "./InstructionsOverlay";
 import DevelopClock from "./DevelopClock";
+import OnboardingTutorial from "./OnboardingTutorial";
+import { hasSeenOnboarding } from "../../utils/onboarding";
 import { useCameraStream } from "../../utils/useCameraStream";
 import { requestAppFullscreen } from "../../utils/fullscreen";
 import { hapticCapture } from "../../utils/haptics";
+import { playShutter } from "../../utils/sounds";
 import { useTheme } from "../../context/ThemeContext";
 import { HOTSPOTS, hotspotStyle } from "../../utils/hotspots";
 import "./CameraBody.css";
@@ -45,6 +48,7 @@ export default function CameraBody({
   const [flashPulse, setFlashPulse] = useState(false);
   const [capturing, setCapturing] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [showOnboarding, setShowOnboarding] = useState(() => !hasSeenOnboarding());
   const fullscreenRequested = useRef(false);
 
   const outOfFilm = shotsRemaining <= 0;
@@ -70,6 +74,7 @@ export default function CameraBody({
 
     try {
       hapticCapture();
+      playShutter();
       await onCapture(videoRef.current, flashOn);
       setFeedback("Cliché capturé. Rendez-vous demain pour le découvrir.");
     } catch (e) {
@@ -207,6 +212,10 @@ export default function CameraBody({
             : "Glisse la molette vers le bas"}
         </p>
       </div>
+
+      {showOnboarding && !developingUntilMs && (
+        <OnboardingTutorial layout={layout} onDone={() => setShowOnboarding(false)} />
+      )}
     </div>
   );
 }
