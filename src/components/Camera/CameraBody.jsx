@@ -176,14 +176,16 @@ export default function CameraBody({
         />
       </div>
 
-      {/* Zone vide de l'image : instructions d'usage tant qu'il reste de
-          la pellicule, ou horloge de développement (non bloquante — le
-          reste de l'app reste utilisable) une fois épuisée. */}
+      {/* Zone vide de l'image : sur le thème par défaut, les instructions
+          sont désormais gravées directement dans l'image (comme un vrai
+          jetable) — l'overlay React ne sert plus que pour les thèmes
+          personnalisés, dont la photo ne peut pas avoir de texte imprimé.
+          L'horloge de développement, elle, s'affiche dans tous les cas. */}
       <div className="camera-body__hotspot camera-body__instructions" style={hotspotStyle(layout.instructionsZone)}>
         {developingUntilMs ? (
           <DevelopClock targetMs={developingUntilMs} ready={!!onReload} onReload={onReload} />
         ) : (
-          <InstructionsOverlay wheelAxis={layout.wheelAxis} />
+          customSkin && <InstructionsOverlay wheelAxis={layout.wheelAxis} />
         )}
       </div>
 

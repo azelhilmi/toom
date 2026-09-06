@@ -24,8 +24,8 @@
    a été repositionnée avec une marge large (>7%) pour ne jamais
    chevaucher un bouton d'action ni le viseur, même à cette taille. */
 .instructions-overlay__logo {
-  width: clamp(24px, 8vmin, 38px);
-  height: clamp(24px, 8vmin, 38px);
+  width: clamp(32px, 9vmin, 46px);
+  height: clamp(32px, 9vmin, 46px);
   object-fit: contain;
   flex-shrink: 0;
 }

@@ -44,3 +44,13 @@
 .brand-mark--large .brand-mark__tagline {
   font-size: 1rem;
 }
+
+.brand-mark__logo--animated {
+  animation: brand-mark-bounce 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+@keyframes brand-mark-bounce {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  30% { transform: scale(1.08) rotate(-3deg); }
+  60% { transform: scale(0.97) rotate(2deg); }
+}
