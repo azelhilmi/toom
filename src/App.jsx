@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -6,6 +6,8 @@ import AppSplash from "./components/AppSplash";
 import OfflineBanner from "./components/OfflineBanner";
 import LoadingScreen from "./components/UI/LoadingScreen";
 import CameraPage from "./pages/CameraPage";
+import LandingPage from "./pages/LandingPage";
+import { hasVisitedBefore } from "./utils/landing";
 
 // Chargées à la demande : ce sont des pages secondaires (réglages,
 // galerie, événements) qui n'ont pas besoin d'alourdir le chargement
@@ -21,6 +23,11 @@ const JoinByCodePage = lazy(() => import("./pages/JoinByCodePage"));
 const EventCameraPage = lazy(() => import("./pages/EventCameraPage"));
 const EventDashboardPage = lazy(() => import("./pages/EventDashboardPage"));
 
+function RootRoute() {
+  const [showLanding, setShowLanding] = useState(() => !hasVisitedBefore());
+  return showLanding ? <LandingPage onEnter={() => setShowLanding(false)} /> : <CameraPage />;
+}
+
 export default function App() {
   return (
     <>
@@ -33,7 +40,7 @@ export default function App() {
               <main className="app-main">
                 <Suspense fallback={<LoadingScreen />}>
                   <Routes>
-                    <Route path="/" element={<CameraPage />} />
+                    <Route path="/" element={<RootRoute />} />
                     <Route path="/gallery" element={<GalleryPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/themes" element={<ThemesPage />} />
