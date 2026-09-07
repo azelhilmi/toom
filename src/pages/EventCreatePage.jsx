@@ -12,6 +12,7 @@ const EVENT_TYPES = [
   { id: "EVG", label: "EVG", icon: "🥂", placeholder: "EVG de Thomas" },
   { id: "EVJF", label: "EVJF", icon: "💃", placeholder: "EVJF de Léa" },
   { id: "MARIAGE", label: "Mariage", icon: "💍", placeholder: "Mariage de Léa & Tom" },
+  { id: "SOIREE", label: "Soirée", icon: "🍺", placeholder: "Soirée d'anniversaire" },
 ];
 
 export default function EventCreatePage() {
@@ -97,14 +98,19 @@ export default function EventCreatePage() {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  function goBack() {
+    setStep((s) => Math.max(1, s - 1));
+  }
+
   return (
     <div className="event-wizard">
       <BackToCameraButton />
       {step < 4 && (
         <div className="event-wizard__progress">
-          {[1, 2, 3].map((s) => (
-            <span key={s} className={`event-wizard__dot ${s <= step ? "event-wizard__dot--done" : ""}`} />
-          ))}
+          <div className="event-wizard__gauge">
+            <div className="event-wizard__gauge-fill" style={{ width: `${(step / 3) * 100}%` }} />
+          </div>
+          <span className="event-wizard__gauge-label">Étape {step} / 3</span>
         </div>
       )}
 
@@ -141,6 +147,14 @@ export default function EventCreatePage() {
               enterKeyHint="next"
               required
             />
+            <div className="event-wizard__nav-row">
+              <button type="button" className="event-wizard__back-btn" onClick={goBack}>
+                ← Retour
+              </button>
+              <button type="submit" className="event-wizard__next-btn" disabled={!name.trim()}>
+                Suivant →
+              </button>
+            </div>
           </form>
         )}
 
@@ -169,6 +183,9 @@ export default function EventCreatePage() {
 
             <button type="submit" className="event-wizard__create-btn" disabled={submitting || !revealDate || !tosAccepted}>
               {submitting ? "Création…" : "Créer l'événement"}
+            </button>
+            <button type="button" className="event-wizard__back-btn event-wizard__back-btn--alone" onClick={goBack} disabled={submitting}>
+              ← Retour
             </button>
           </form>
         )}

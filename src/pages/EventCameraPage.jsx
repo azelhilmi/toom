@@ -50,8 +50,9 @@ export default function EventCameraPage() {
       shotsAllowed={roll.shotsAllowed}
       onCapture={handleCapture}
       developingUntilMs={isFull ? revealAtMs : null}
-      overrideSkin={eventTheme ? eventTheme.background : undefined}
-      overrideMaskColor={eventTheme ? eventTheme.maskColor : undefined}
+      overrideSkin={eventTheme ? (eventTheme.presetId ? null : eventTheme.background) : undefined}
+      overrideMaskColor={eventTheme ? (eventTheme.presetId ? null : eventTheme.maskColor) : undefined}
+      overridePresetId={eventTheme?.presetId ?? undefined}
     />
   );
 }

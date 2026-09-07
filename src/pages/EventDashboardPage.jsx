@@ -4,10 +4,13 @@ import PhotoCard from "../components/Gallery/PhotoCard";
 import Lightbox from "../components/Gallery/Lightbox";
 import {
   listenEventGuests, listenEventPhotos, getEvent, updateEvent,
-  syncGuestShotsAllowed, resetGuestRoll, saveEventTheme, clearEventTheme,
-  deletePhoto, deleteEvent,
+  syncGuestShotsAllowed, resetGuestRoll, saveEventTheme, saveEventThemePreset, clearEventTheme,
+  deletePhoto, deleteEvent, getThemeBackground,
 } from "../firebase/firestore";
-import { imageToOptimizedBase64 } from "../utils/imageCompression";
+import { blobToBase64 } from "../utils/imageCompression";
+import { PRESET_THEMES } from "../utils/hotspots";
+import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 import { downloadPhotosAsZip } from "../utils/downloadAlbum";
 import ImageCropModal from "../components/UI/ImageCropModal";
 import "./EventDashboardPage.css";
@@ -27,6 +30,8 @@ function toDatetimeLocalValue(timestamp) {
 export default function EventDashboardPage() {
   const { eventId } = useParams();
   const navigate = useNavigate();
+  const { myThemes } = useTheme();
+  const { user } = useAuth();
   const [event, setEvent] = useState(null);
   const [guests, setGuests] = useState([]);
   const [photos, setPhotos] = useState([]);
@@ -40,7 +45,9 @@ export default function EventDashboardPage() {
   const [busyGuestId, setBusyGuestId] = useState(null);
   const [zipProgress, setZipProgress] = useState(null);
 
-  // Thème imposé aux invités.
+  // Thème imposé aux invités — 3 sources possibles.
+  const [themeTab, setThemeTab] = useState("preset"); // "preset" | "mine" | "upload"
+  const [applyingThemeId, setApplyingThemeId] = useState(null);
   const [pendingFile, setPendingFile] = useState(null);
   const [croppedBlob, setCroppedBlob] = useState(null);
   const [maskColor, setMaskColor] = useState(DEFAULT_MASK_COLOR);
@@ -109,10 +116,33 @@ export default function EventDashboardPage() {
     if (file) setPendingFile(file);
   }
 
+  async function handleApplyPreset(presetKey) {
+    setSavingTheme(true);
+    await saveEventThemePreset(eventId, presetKey);
+    const refreshed = await getEvent(eventId);
+    setEvent(refreshed);
+    setSavingTheme(false);
+  }
+
+  async function handleApplyMyTheme(theme) {
+    setApplyingThemeId(theme.id);
+    try {
+      // On duplique le fond dans l'événement (les invités n'ont pas accès
+      // à la bibliothèque personnelle de l'organisateur) — même stockage
+      // qu'un nouvel upload, juste sans repasser par le recadrage.
+      const background = await getThemeBackground(user.uid, theme.id, theme.chunkCount);
+      await saveEventTheme(eventId, { maskColor: theme.maskColor, backgroundBase64: background });
+      const refreshed = await getEvent(eventId);
+      setEvent(refreshed);
+    } finally {
+      setApplyingThemeId(null);
+    }
+  }
+
   async function handleSaveTheme() {
     if (!croppedBlob) return;
     setSavingTheme(true);
-    const optimized = await imageToOptimizedBase64(croppedBlob, 1200, 0.85);
+    const optimized = await blobToBase64(croppedBlob);
     await saveEventTheme(eventId, {
       maskColor: transparent ? "transparent" : maskColor,
       backgroundBase64: optimized,
@@ -230,13 +260,24 @@ export default function EventDashboardPage() {
           <div className="event-dashboard__theme-section">
             <p className="event-dashboard__theme-title">Habillage imposé aux invités</p>
 
-            {event.themeChunkCount > 0 && !croppedBlob ? (
+            {(event.themeChunkCount > 0 || event.themePresetId) && !croppedBlob ? (
               <div className="event-dashboard__theme-current">
-                <span
-                  className="event-dashboard__theme-swatch"
-                  style={{ background: event.themeMaskColor === "transparent" ? "#8a8a8a" : event.themeMaskColor }}
-                />
-                <span>Un habillage est actuellement imposé à tous les invités.</span>
+                {event.themePresetId ? (
+                  <span
+                    className="event-dashboard__theme-swatch"
+                    style={{ backgroundImage: `url(${PRESET_THEMES[event.themePresetId]?.portrait})`, backgroundSize: "cover" }}
+                  />
+                ) : (
+                  <span
+                    className="event-dashboard__theme-swatch"
+                    style={{ background: event.themeMaskColor === "transparent" ? "#8a8a8a" : event.themeMaskColor }}
+                  />
+                )}
+                <span>
+                  {event.themePresetId
+                    ? `Thème "${PRESET_THEMES[event.themePresetId]?.name}" imposé à tous les invités.`
+                    : "Un habillage personnalisé est imposé à tous les invités."}
+                </span>
                 <button type="button" className="event-dashboard__link-btn event-dashboard__link-btn--danger" onClick={handleClearTheme}>
                   Retirer
                 </button>
@@ -247,48 +288,108 @@ export default function EventDashboardPage() {
               </p>
             )}
 
-            {pendingFile && (
-              <ImageCropModal
-                file={pendingFile}
-                onConfirm={(blob) => {
-                  setCroppedBlob(blob);
-                  setPendingFile(null);
-                }}
-                onCancel={() => {
-                  setPendingFile(null);
-                  if (fileInputRef.current) fileInputRef.current.value = "";
-                }}
-              />
+            <div className="event-dashboard__theme-tabs">
+              <button type="button" className={themeTab === "preset" ? "active" : ""} onClick={() => setThemeTab("preset")}>
+                Préréglé
+              </button>
+              <button type="button" className={themeTab === "mine" ? "active" : ""} onClick={() => setThemeTab("mine")}>
+                Mes thèmes
+              </button>
+              <button type="button" className={themeTab === "upload" ? "active" : ""} onClick={() => setThemeTab("upload")}>
+                Nouvelle image
+              </button>
+            </div>
+
+            {themeTab === "preset" && (
+              <div className="event-dashboard__preset-grid">
+                {Object.entries(PRESET_THEMES).map(([key, preset]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={`event-dashboard__preset-card ${event.themePresetId === key ? "event-dashboard__preset-card--active" : ""}`}
+                    onClick={() => handleApplyPreset(key)}
+                    disabled={savingTheme}
+                    style={{ backgroundImage: `url(${preset.portrait})` }}
+                  >
+                    <span>{preset.name}</span>
+                  </button>
+                ))}
+              </div>
             )}
 
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleThemeFileSelected}
-              accept="image/*"
-              id="event-theme-upload"
-              style={{ display: "none" }}
-            />
-            <label htmlFor="event-theme-upload" className="event-form__upload-button">
-              {croppedBlob ? "Changer l'image" : "Choisir une nouvelle image"}
-            </label>
-
-            {croppedBlob && (
-              <>
-                <div
-                  className="event-form__theme-preview"
-                  style={{ backgroundImage: `url(${URL.createObjectURL(croppedBlob)})` }}
-                />
-                <div className="event-form__color-row">
-                  <input type="color" value={maskColor} onChange={(e) => setMaskColor(e.target.value)} disabled={transparent} />
-                  <label className="event-form__checkbox-label">
-                    <input type="checkbox" checked={transparent} onChange={(e) => setTransparent(e.target.checked)} />
-                    Garder le mécanisme gris d'origine
-                  </label>
+            {themeTab === "mine" && (
+              myThemes.length > 0 ? (
+                <div className="event-dashboard__mine-grid">
+                  {myThemes.map((theme) => (
+                    <button
+                      key={theme.id}
+                      type="button"
+                      className="event-dashboard__mine-card"
+                      onClick={() => handleApplyMyTheme(theme)}
+                      disabled={applyingThemeId === theme.id}
+                    >
+                      {theme.thumbnail ? (
+                        <img src={theme.thumbnail} alt="" />
+                      ) : (
+                        <span className="event-dashboard__mine-card-fallback" style={{ background: theme.maskColor }} />
+                      )}
+                      <span>{applyingThemeId === theme.id ? "…" : theme.name}</span>
+                    </button>
+                  ))}
                 </div>
-                <button type="button" className="event-dashboard__btn event-dashboard__btn--primary" onClick={handleSaveTheme} disabled={savingTheme}>
-                  {savingTheme ? "Enregistrement…" : "Appliquer cet habillage"}
-                </button>
+              ) : (
+                <p className="event-dashboard__note">
+                  Tu n'as pas encore de thème personnel — crée-en un depuis la page Thèmes.
+                </p>
+              )
+            )}
+
+            {themeTab === "upload" && (
+              <>
+                {pendingFile && (
+                  <ImageCropModal
+                    file={pendingFile}
+                    onConfirm={(blob) => {
+                      setCroppedBlob(blob);
+                      setPendingFile(null);
+                    }}
+                    onCancel={() => {
+                      setPendingFile(null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                  />
+                )}
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleThemeFileSelected}
+                  accept="image/*"
+                  id="event-theme-upload"
+                  style={{ display: "none" }}
+                />
+                <label htmlFor="event-theme-upload" className="event-form__upload-button">
+                  {croppedBlob ? "Changer l'image" : "Choisir une nouvelle image"}
+                </label>
+
+                {croppedBlob && (
+                  <>
+                    <div
+                      className="event-form__theme-preview"
+                      style={{ backgroundImage: `url(${URL.createObjectURL(croppedBlob)})` }}
+                    />
+                    <div className="event-form__color-row">
+                      <input type="color" value={maskColor} onChange={(e) => setMaskColor(e.target.value)} disabled={transparent} />
+                      <label className="event-form__checkbox-label">
+                        <input type="checkbox" checked={transparent} onChange={(e) => setTransparent(e.target.checked)} />
+                        Garder le mécanisme gris d'origine
+                      </label>
+                    </div>
+                    <button type="button" className="event-dashboard__btn event-dashboard__btn--primary" onClick={handleSaveTheme} disabled={savingTheme}>
+                      {savingTheme ? "Enregistrement…" : "Appliquer cet habillage"}
+                    </button>
+                  </>
+                )}
               </>
             )}
           </div>

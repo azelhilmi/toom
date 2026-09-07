@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 import { saveTheme, deleteTheme, setActiveTheme } from "../firebase/firestore";
-import { imageToOptimizedBase64 } from "../utils/imageCompression";
+import { blobToBase64, resizeToWebP } from "../utils/imageCompression";
 import { PRESET_THEMES } from "../utils/hotspots";
 import ImageCropModal from "../components/UI/ImageCropModal";
 import BackToCameraButton from "../components/UI/BackToCameraButton";
@@ -46,11 +46,21 @@ export default function ThemesPage() {
     setIsSaving(true);
     setError(null);
     try {
-      const optimized = await imageToOptimizedBase64(croppedBlob, 1200, 0.85);
+      // Déjà recadrée et compressée en WebP par ImageCropModal — un
+      // second passage de compression ne faisait que ré-encoder à
+      // l'identique (même taille), pour rien. Seule une petite vignette
+      // (pour l'aperçu dans la liste) a besoin d'un nouveau passage,
+      // volontairement minuscule pour rester rapide.
+      const [optimized, thumbBlob] = await Promise.all([
+        blobToBase64(croppedBlob),
+        resizeToWebP(croppedBlob, 160, 0.7),
+      ]);
+      const thumbnail = await blobToBase64(thumbBlob);
       const themeId = await saveTheme(user.uid, {
         name: themeName.trim(),
         maskColor: transparent ? "transparent" : maskColor,
         backgroundBase64: optimized,
+        thumbnail,
       });
       await setActiveTheme(user.uid, themeId);
       resetCreationForm();
@@ -142,10 +152,14 @@ export default function ThemesPage() {
             {myThemes.map((theme) => (
               <div key={theme.id} className={`theme-list__item ${activeThemeId === theme.id ? "theme-list__item--active" : ""}`}>
                 <button type="button" className="theme-list__select" onClick={() => handleSelectCustom(theme.id)}>
-                  <span
-                    className="theme-list__swatch"
-                    style={{ background: theme.maskColor === "transparent" ? "transparent" : theme.maskColor }}
-                  />
+                  {theme.thumbnail ? (
+                    <img src={theme.thumbnail} alt="" className="theme-list__thumb" />
+                  ) : (
+                    <span
+                      className="theme-list__swatch"
+                      style={{ background: theme.maskColor === "transparent" ? "transparent" : theme.maskColor }}
+                    />
+                  )}
                   <span className="theme-list__name">{theme.name}</span>
                   {activeThemeId === theme.id && <span className="theme-list__badge">Actif</span>}
                 </button>

@@ -84,7 +84,7 @@ export default function ImageCropModal({ file, onConfirm, onCancel }) {
     ctx.scale(scale, scale);
     ctx.drawImage(imgEl, -imgEl.width / 2, -imgEl.height / 2);
     ctx.restore();
-    canvas.toBlob((blob) => onConfirm(blob), "image/jpeg", 0.92);
+    canvas.toBlob((blob) => onConfirm(blob), "image/webp", 0.85);
   }
 
   return (

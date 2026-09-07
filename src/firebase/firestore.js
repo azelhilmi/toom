@@ -303,7 +303,13 @@ function eventThemeChunkRef(eventId, i) {
 export async function saveEventTheme(eventId, { maskColor, backgroundBase64 }) {
   const chunkCount = Math.ceil(backgroundBase64.length / EVENT_THEME_CHUNK_SIZE);
   const batch = writeBatch(db);
-  batch.set(doc(db, "events", eventId), { themeMaskColor: maskColor, themeChunkCount: chunkCount }, { merge: true });
+  // themePresetId effacé : un fond personnalisé (upload ou copie d'un
+  // thème perso) et un préréglé sont mutuellement exclusifs.
+  batch.set(
+    doc(db, "events", eventId),
+    { themeMaskColor: maskColor, themeChunkCount: chunkCount, themePresetId: null },
+    { merge: true }
+  );
   for (let i = 0; i < chunkCount; i++) {
     batch.set(eventThemeChunkRef(eventId, i), {
       data: backgroundBase64.slice(i * EVENT_THEME_CHUNK_SIZE, (i + 1) * EVENT_THEME_CHUNK_SIZE),
@@ -312,11 +318,31 @@ export async function saveEventTheme(eventId, { maskColor, backgroundBase64 }) {
   await batch.commit();
 }
 
+/**
+ * Impose un thème PRÉRÉGLÉ (fourni avec l'app) à tous les invités —
+ * aucune image à uploader ni à dupliquer, juste une référence. Efface
+ * un éventuel fond personnalisé précédemment défini (exclusif).
+ */
+export async function saveEventThemePreset(eventId, presetId) {
+  const event = await getEvent(eventId);
+  const chunkCount = event?.themeChunkCount || 0;
+  const batch = writeBatch(db);
+  batch.set(
+    doc(db, "events", eventId),
+    { themePresetId: presetId, themeMaskColor: null, themeChunkCount: 0 },
+    { merge: true }
+  );
+  for (let i = 0; i < chunkCount; i++) {
+    batch.delete(eventThemeChunkRef(eventId, i));
+  }
+  await batch.commit();
+}
+
 export async function clearEventTheme(eventId) {
   const event = await getEvent(eventId);
   const chunkCount = event?.themeChunkCount || 0;
   const batch = writeBatch(db);
-  batch.set(doc(db, "events", eventId), { themeMaskColor: null, themeChunkCount: 0 }, { merge: true });
+  batch.set(doc(db, "events", eventId), { themeMaskColor: null, themeChunkCount: 0, themePresetId: null }, { merge: true });
   for (let i = 0; i < chunkCount; i++) {
     batch.delete(eventThemeChunkRef(eventId, i));
   }
@@ -324,11 +350,13 @@ export async function clearEventTheme(eventId) {
 }
 
 /**
- * Charge le thème imposé d'un événement (fond + couleur), ou null si
- * l'organisateur n'en a pas défini.
+ * Charge le thème imposé d'un événement (fond personnalisé + couleur,
+ * OU référence à un préréglé), ou null si l'organisateur n'en a pas
+ * défini.
  */
 export async function getEventTheme(eventId) {
   const event = await getEvent(eventId);
+  if (event?.themePresetId) return { presetId: event.themePresetId };
   if (!event?.themeChunkCount) return null;
   const chunkSnaps = await Promise.all(
     Array.from({ length: event.themeChunkCount }, (_, i) => getDoc(eventThemeChunkRef(eventId, i)))
@@ -446,11 +474,11 @@ function themeChunkRef(uid, themeId, i) {
 /**
  * Crée un nouveau thème nommé. Retourne son identifiant.
  */
-export async function saveTheme(uid, { name, maskColor, backgroundBase64 }) {
+export async function saveTheme(uid, { name, maskColor, backgroundBase64, thumbnail }) {
   const themeRef = doc(collection(db, "userThemes", uid, "themes"));
   const chunkCount = Math.ceil(backgroundBase64.length / THEME_CHUNK_SIZE);
   const batch = writeBatch(db);
-  batch.set(themeRef, { name, maskColor, chunkCount, createdAt: serverTimestamp() });
+  batch.set(themeRef, { name, maskColor, chunkCount, thumbnail: thumbnail || null, createdAt: serverTimestamp() });
   for (let i = 0; i < chunkCount; i++) {
     batch.set(themeChunkRef(uid, themeRef.id, i), {
       data: backgroundBase64.slice(i * THEME_CHUNK_SIZE, (i + 1) * THEME_CHUNK_SIZE),
