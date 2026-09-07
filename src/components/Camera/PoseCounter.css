@@ -15,9 +15,4 @@
   color: #2a2a2a;
   font-variant-numeric: tabular-nums;
   user-select: none;
-  transition: color 0.2s ease;
-}
-
-.pose-counter__number--low {
-  color: #c8102e;
 }

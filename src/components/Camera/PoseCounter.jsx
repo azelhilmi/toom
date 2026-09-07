@@ -1,11 +1,7 @@
 import { FISHEYE_MAP } from "../../utils/fisheyeMap";
 import "./PoseCounter.css";
 
-const LOW_THRESHOLD = 5;
-
 export default function PoseCounter({ remaining }) {
-  const isLow = remaining <= LOW_THRESHOLD;
-
   return (
     <div className="pose-counter">
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
@@ -14,7 +10,7 @@ export default function PoseCounter({ remaining }) {
           <feDisplacementMap in="SourceGraphic" in2="map" scale="40" xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
-      <span className={`pose-counter__number ${isLow ? "pose-counter__number--low" : ""}`}>{remaining}</span>
+      <span className="pose-counter__number">{remaining}</span>
     </div>
   );
 }
