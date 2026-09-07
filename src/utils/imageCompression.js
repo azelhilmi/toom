@@ -42,10 +42,7 @@ export async function captureFramePrintQuality(videoEl, { eventName = null } = {
   applyGrain(ctx, width, height, 12);
   applyDustAndScratches(ctx, width, height);
 
-  // Coordonnées GPS best-effort (jamais bloquant : 1.5s max, silencieux
-  // si refusé/indisponible) avant de graver le date-stamp.
-  const position = await getPositionWithTimeout(1500);
-  drawDateStamp(ctx, width, height, { eventName, position });
+  drawDateStamp(ctx, width, height, { eventName });
 
   const webpBlob = await canvasToBlob(canvas, "image/webp", IMAGE_QUALITY);
   if (webpBlob && webpBlob.type === "image/webp") return webpBlob;
@@ -183,48 +180,17 @@ function applyDustAndScratches(ctx, width, height) {
 }
 
 /**
- * Position GPS best-effort : ne bloque jamais la prise de vue plus de
- * `timeoutMs`, et échoue silencieusement (refus, indisponibilité,
- * contexte non sécurisé) plutôt que de faire planter la capture.
- */
-function getPositionWithTimeout(timeoutMs) {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) {
-      resolve(null);
-      return;
-    }
-    const timer = setTimeout(() => resolve(null), timeoutMs);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        clearTimeout(timer);
-        resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-      },
-      () => {
-        clearTimeout(timer);
-        resolve(null);
-      },
-      { timeout: timeoutMs, maximumAge: 300_000 }
-    );
-  });
-}
-
-function formatCoord(value, posLetter, negLetter) {
-  const letter = value >= 0 ? posLetter : negLetter;
-  return `${Math.abs(value).toFixed(3)}°${letter}`;
-}
-
-/**
  * Grave la ligne "date-stamp" orangée en bas de la photo, comme les
  * appareils compacts/jetables des années 90 qui impressionnaient la
- * date directement sur le négatif : date, événement (le cas échéant)
- * et position GPS (si disponible), sur une seule ligne discrète.
+ * date directement sur le négatif : date et nom de l'événement (le cas
+ * échéant), sur une seule ligne discrète, police monospace façon
+ * afficheur digital rétro.
  */
-function drawDateStamp(ctx, width, height, { eventName, position }) {
+function drawDateStamp(ctx, width, height, { eventName }) {
   const d = new Date();
   const pad = (n) => String(n).padStart(2, "0");
   const parts = [`${pad(d.getDate())} ${pad(d.getMonth() + 1)} ${String(d.getFullYear()).slice(2)}`];
   if (eventName) parts.push(eventName.toUpperCase());
-  if (position) parts.push(`${formatCoord(position.lat, "N", "S")} ${formatCoord(position.lon, "E", "O")}`);
   const text = parts.join("   ");
 
   const fontSize = Math.max(14, Math.round(width * 0.022));

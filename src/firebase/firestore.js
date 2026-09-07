@@ -8,7 +8,18 @@ import { captureFrameAsBase64 } from "../utils/imageCompression";
 import { canReuseRoll } from "../utils/rollLogic";
 
 const DAILY_SHOTS = 24;
-const REVEAL_DELAY_MS = 24 * 60 * 60 * 1000;
+/**
+ * Date de révélation : le lendemain du jour de la première photo, à
+ * 10h00 heure locale (celle de l'appareil qui prend la photo) — plus
+ * prévisible qu'un délai glissant de 24h qui tombait à une heure
+ * différente selon le moment de la prise de vue.
+ */
+function computeRevealAt(firstPhotoDate) {
+  const d = new Date(firstPhotoDate);
+  d.setDate(d.getDate() + 1);
+  d.setHours(10, 0, 0, 0);
+  return Timestamp.fromDate(d);
+}
 
 /**
  * Récupère la pellicule "active" de l'utilisateur, ou en crée une
@@ -98,7 +109,7 @@ export async function takePhoto({ cameraId, ownerId, videoEl, flashUsed, guestNa
     revealAt = cameraData.revealAt || null;
     if (!cameraData.firstPhotoAt) {
       const firstPhotoAt = Timestamp.now();
-      revealAt = Timestamp.fromMillis(firstPhotoAt.toMillis() + REVEAL_DELAY_MS);
+      revealAt = computeRevealAt(firstPhotoAt.toDate());
       cameraUpdates.firstPhotoAt = firstPhotoAt;
       cameraUpdates.revealAt = revealAt;
     }
