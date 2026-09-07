@@ -5,7 +5,6 @@ import PoseCounter from "./PoseCounter";
 import FlashButton from "./FlashButton";
 import HamburgerMenu from "../UI/HamburgerMenu";
 import GalleryShortcut from "../UI/GalleryShortcut";
-import InstructionsOverlay from "./InstructionsOverlay";
 import DevelopClock from "./DevelopClock";
 import OnboardingTutorial from "./OnboardingTutorial";
 import { hasSeenOnboarding } from "../../utils/onboarding";
@@ -177,41 +176,39 @@ export default function CameraBody({
           disabled={outOfFilm}
           onArmed={() => setArmed(true)}
           axis={layout.wheelAxis}
+          hotspotSize={layout.filmWheel}
+          visualSize={layout.filmWheelVisual}
           bare
         />
       </div>
 
-      {/* Zone vide de l'image : sur le thème par défaut, les instructions
-          sont désormais gravées directement dans l'image (comme un vrai
-          jetable) — l'overlay React ne sert plus que pour les thèmes
-          personnalisés, dont la photo ne peut pas avoir de texte imprimé.
-          L'horloge de développement, elle, s'affiche dans tous les cas. */}
-      <div className="camera-body__hotspot camera-body__instructions" style={hotspotStyle(layout.instructionsZone)}>
-        {developingUntilMs ? (
+      {/* Horloge de développement une fois la pellicule épuisée — les
+          instructions de base ont été retirées, redondantes avec le
+          didacticiel affiché au premier lancement (voir plus bas). */}
+      {developingUntilMs && (
+        <div className="camera-body__hotspot camera-body__instructions" style={hotspotStyle(layout.instructionsZone)}>
           <DevelopClock targetMs={developingUntilMs} ready={!!onReload} onReload={onReload} />
-        ) : (
-          customSkin && <InstructionsOverlay wheelAxis={layout.wheelAxis} />
-        )}
-      </div>
+        </div>
+      )}
 
       <HamburgerMenu />
       <GalleryShortcut />
 
-      {/* Cadre "étiquette" bien visible pour le statut courant (armé,
-          instructions de glissé, retour après capture…). */}
-      <div className="camera-body__status-label">
-        <p className="camera-body__status-text" role="status">
-          {outOfFilm
-            ? "Pellicule épuisée — regarde l'heure de développement ci-dessus."
-            : feedback
-            ? feedback
-            : armed
-            ? "Prêt ! Appuie sur le déclencheur."
-            : layout.wheelAxis === "horizontal"
-            ? "Glisse la molette vers la droite"
-            : "Glisse la molette vers le bas"}
-        </p>
-      </div>
+      {/* Cadre "étiquette" — uniquement pour un statut réellement utile
+          (armé, retour après capture, pellicule épuisée). Le rappel de
+          base "glisse la molette" a été retiré : le didacticiel du
+          premier lancement s'en charge déjà. */}
+      {(outOfFilm || feedback || armed) && (
+        <div className="camera-body__status-label">
+          <p className="camera-body__status-text" role="status">
+            {outOfFilm
+              ? "Pellicule épuisée — regarde l'heure de développement ci-dessus."
+              : feedback
+              ? feedback
+              : "Prêt ! Appuie sur le déclencheur."}
+          </p>
+        </div>
+      )}
 
       {showOnboarding && !developingUntilMs && (
         <OnboardingTutorial layout={layout} onDone={() => setShowOnboarding(false)} />

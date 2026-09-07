@@ -53,7 +53,14 @@ export default function OnboardingTutorial({ layout, onDone }) {
     <div className="onboarding">
       <div className="onboarding__backdrop" />
 
-      <div className="onboarding__ring" style={hotspotStyle(step.target)} />
+      <div
+        className="onboarding__ring"
+        style={{
+          left: hotspotStyle(step.target).left,
+          top: hotspotStyle(step.target).top,
+          transform: hotspotStyle(step.target).transform,
+        }}
+      />
 
       <div className="onboarding__bubble">
         <p className="onboarding__step-count">Étape {stepIndex + 1} / {steps.length}</p>

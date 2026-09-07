@@ -28,7 +28,11 @@ export const HOTSPOTS = {
     // Zone de clic élargie mais modérée (l'agrandissement précédent
     // grignotait trop l'espace disponible pour les instructions).
     shutter: { x: 49.7, y: 75.8, w: 20, h: 20 },
+    // Zone de clic élargie (plus facile à viser), mais le crantage
+    // visuel doit rester sur la vraie molette dessinée : voir
+    // filmWheelVisual, mesure d'origine avant agrandissement.
     filmWheel: { x: 91, y: 11, w: 26, h: 18 },
+    filmWheelVisual: { w: 20, h: 14 },
     // Zone vide entre la grip du haut (viseur/flash/molette, finit vers
     // 17%) et la zone déclencheur/poses du bas (débute vers 65.8%) —
     // marge de sécurité large (>8%) des deux côtés, plus généreuse que
@@ -45,6 +49,7 @@ export const HOTSPOTS = {
     flashButton: { x: 84.6, y: 26.2, w: 14, h: 14 },
     shutter: { x: 48.9, y: 73.3, w: 20, h: 20 },
     filmWheel: { x: 89.9, y: 8.9, w: 13, h: 19 },
+    filmWheelVisual: { w: 10, h: 18 },
     // Le flash occupe la colonne droite jusqu'à y≈33% — zone
     // d'instructions resserrée avec marge large des deux côtés
     // (>6.5%) plutôt que le minimum tout juste suffisant d'avant.

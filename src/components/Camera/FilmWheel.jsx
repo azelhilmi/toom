@@ -8,7 +8,7 @@ const DRAG_DISTANCE_NEEDED = 140;
 // Nombre de "crans" haptiques/sonores ressentis pendant le glissé complet.
 const NOTCH_COUNT = 5;
 
-export default function FilmWheel({ armed, disabled, onArmed, axis = "horizontal" }) {
+export default function FilmWheel({ armed, disabled, onArmed, axis = "horizontal", hotspotSize, visualSize }) {
   const [progress, setProgress] = useState(0); // 0 → 1
   // Décalage continu (en px, jamais remis à zéro sauf à l'armement) qui
   // pilote le motif de crantage visuel — donne l'impression que la
@@ -71,7 +71,18 @@ export default function FilmWheel({ armed, disabled, onArmed, axis = "horizontal
       aria-label={armed ? "Film remonté" : `Glisse pour remonter le film`}
       style={{ "--wheel-progress": progress, "--wheel-roll": `${rollOffset}px` }}
     >
-      <div className="film-wheel-hotspot__ridges" aria-hidden="true" />
+      <div
+        className="film-wheel-hotspot__ridges"
+        aria-hidden="true"
+        style={
+          hotspotSize && visualSize
+            ? {
+                width: `${(visualSize.w / hotspotSize.w) * 100}%`,
+                height: `${(visualSize.h / hotspotSize.h) * 100}%`,
+              }
+            : undefined
+        }
+      />
     </div>
   );
 }

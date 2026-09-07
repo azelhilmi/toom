@@ -11,6 +11,11 @@
 }
 
 .onboarding__ring {
+  position: absolute;
+  width: 14vmin;
+  height: 14vmin;
+  max-width: 90%;
+  max-height: 90%;
   border-radius: 50%;
   border: 3px solid var(--flash-on, #ff5a3c);
   box-shadow: 0 0 0 6px rgba(255, 90, 60, 0.25), 0 0 24px rgba(255, 90, 60, 0.6);
