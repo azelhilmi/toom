@@ -13,7 +13,7 @@ import { requestAppFullscreen } from "../../utils/fullscreen";
 import { hapticCapture } from "../../utils/haptics";
 import { playShutter } from "../../utils/sounds";
 import { useTheme } from "../../context/ThemeContext";
-import { HOTSPOTS, hotspotStyle } from "../../utils/hotspots";
+import { HOTSPOTS, PRESET_THEMES, hotspotStyle } from "../../utils/hotspots";
 import "./CameraBody.css";
 
 function useOrientation() {
@@ -31,7 +31,7 @@ function useOrientation() {
 
 export default function CameraBody({
   shotsRemaining, shotsAllowed, onCapture, developingUntilMs = null, onReload = null,
-  overrideSkin = undefined, overrideMaskColor = undefined,
+  overrideSkin = undefined, overrideMaskColor = undefined, overridePresetId = undefined,
 }) {
   const { videoRef, error, ready, torchSupported, applyTorch, retry } = useCameraStream();
   const themeCtx = useTheme();
@@ -39,8 +39,11 @@ export default function CameraBody({
   // dans ce cas il prime sur le thème personnel de l'invité.
   const customSkin = overrideSkin !== undefined ? overrideSkin : themeCtx.customSkin;
   const maskColor = overrideMaskColor !== undefined ? overrideMaskColor : themeCtx.maskColor;
+  const presetId = overridePresetId !== undefined ? overridePresetId : themeCtx.presetId;
   const orientation = useOrientation();
   const layout = HOTSPOTS[orientation];
+  const preset = PRESET_THEMES[presetId] || PRESET_THEMES.default;
+  const skinSrc = customSkin || preset[orientation];
 
   const [armed, setArmed] = useState(false);
   const [flashOn, setFlashOn] = useState(false);
@@ -88,45 +91,17 @@ export default function CameraBody({
 
   return (
     <div className="camera-body" onPointerDownCapture={tryEnterFullscreen}>
-      {/* Couche 1 : viseur et compte-poses, révélés à travers les vraies
-          zones transparentes de l'image du boîtier posée par-dessus. */}
-      <div className="camera-body__viewfinder-slot" style={hotspotStyle(layout.viewfinder)}>
-        <Viewfinder videoRef={videoRef} error={error} flashPulse={flashPulse} retry={retry} fill />
-      </div>
-      <div className="camera-body__pose-slot" style={hotspotStyle(layout.poseCounter)}>
-        <PoseCounter remaining={Math.max(shotsRemaining, 0)} total={shotsAllowed} bare />
-      </div>
-
-      {/* Couche 2 : l'image du boîtier (par défaut ou personnalisée),
-          étirée pour remplir exactement l'écran quelle que soit sa taille.
-          Pour une image personnalisée, seules les 2 fenêtres (viseur,
-          poses) sont découpées — le reste du corps est entièrement
-          recouvert par la photo, exactement comme le jaune du thème
-          par défaut. */}
-      <img
-        className="camera-body__skin"
-        src={customSkin || layout.skin}
-        alt=""
-        draggable={false}
-        style={
-          customSkin
-            ? {
-                WebkitMaskImage: `url(${layout.windowsCutout})`,
-                maskImage: `url(${layout.windowsCutout})`,
-                WebkitMaskSize: "100% 100%",
-                maskSize: "100% 100%",
-                WebkitMaskRepeat: "no-repeat",
-                maskRepeat: "no-repeat",
-              }
-            : undefined
-        }
-      />
+      {/* Couche 1 : l'image du boîtier — préréglée ou personnalisée,
+          étirée pour remplir exactement l'écran. Le viseur et le
+          compte-poses se dessinent PAR-DESSUS (couche 2), pas révélés
+          à travers une découpe : certains habillages n'ont pas de
+          vraie transparence, cette approche marche dans tous les cas. */}
+      <img className="camera-body__skin" src={skinSrc} alt="" draggable={false} />
 
       {/* Sur une image personnalisée uniquement : le mécanisme (boutons,
           molette, grip) reste visible par-dessus — recoloré si le thème
           choisit une couleur, ou affiché tel quel dans son gris naturel
-          si le thème choisit "transparent" (= pas de teinte appliquée,
-          on laisse le gris d'origine, pas de trou dans les boutons). */}
+          si le thème choisit "transparent". */}
       {customSkin && maskColor && maskColor !== "transparent" ? (
         <div
           className="camera-body__skin-relief"
@@ -142,17 +117,18 @@ export default function CameraBody({
         />
       ) : (
         customSkin && (
-          <img
-            className="camera-body__skin-relief"
-            src={layout.mask}
-            alt=""
-            draggable={false}
-          />
+          <img className="camera-body__skin-relief" src={layout.mask} alt="" draggable={false} />
         )
       )}
 
-      {/* Sur le thème par défaut uniquement : léger grain texturé pour
-          casser l'aplat de couleur, qui paraissait un peu vide/plat. */}
+      {/* Couche 2 : viseur et compte-poses, par-dessus l'image, exactement
+          à l'endroit où elle dessine leurs fenêtres. */}
+      <div className="camera-body__viewfinder-slot" style={hotspotStyle(layout.viewfinder)}>
+        <Viewfinder videoRef={videoRef} error={error} flashPulse={flashPulse} retry={retry} fill />
+      </div>
+      <div className="camera-body__pose-slot" style={hotspotStyle(layout.poseCounter)}>
+        <PoseCounter remaining={Math.max(shotsRemaining, 0)} total={shotsAllowed} bare />
+      </div>
 
       {/* Couche 3 : zones fonctionnelles transparentes, superposées
           exactement à l'endroit où l'image dessine chaque contrôle. */}
@@ -182,9 +158,6 @@ export default function CameraBody({
         />
       </div>
 
-      {/* Horloge de développement une fois la pellicule épuisée — les
-          instructions de base ont été retirées, redondantes avec le
-          didacticiel affiché au premier lancement (voir plus bas). */}
       {developingUntilMs && (
         <div className="camera-body__hotspot camera-body__instructions" style={hotspotStyle(layout.instructionsZone)}>
           <DevelopClock targetMs={developingUntilMs} ready={!!onReload} onReload={onReload} />
@@ -194,10 +167,6 @@ export default function CameraBody({
       <HamburgerMenu />
       <GalleryShortcut />
 
-      {/* Cadre "étiquette" — uniquement pour un statut réellement utile
-          (armé, retour après capture, pellicule épuisée). Le rappel de
-          base "glisse la molette" a été retiré : le didacticiel du
-          premier lancement s'en charge déjà. */}
       {(outOfFilm || feedback || armed) && (
         <div className="camera-body__status-label">
           <p className="camera-body__status-text" role="status">

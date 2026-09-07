@@ -1,61 +1,73 @@
 /**
  * Coordonnées (en % de la largeur/hauteur du boîtier) des éléments
- * fonctionnels, mesurées précisément sur les images de référence
- * fournies (analyse pixel par pixel des zones transparentes/grises).
+ * fonctionnels, mesurées précisément sur les images de référence.
+ * Communes à TOUS les thèmes (par défaut, préréglés ou personnalisés) :
+ * ils partagent le même moule de boîtier, seul l'habillage change.
  *
- * Le viseur et le compte-poses sont RÉVÉLÉS À TRAVERS de vraies zones
- * transparentes de l'image du boîtier (vérifié : alpha=0 à ces
- * coordonnées même dans l'image jaune "remplie") — ils doivent donc
- * être rendus DERRIÈRE l'image. Le déclencheur, le flash et la molette
- * sont dessinés en plein dans l'image ; nos contrôles réels sont des
- * zones cliquables/glissables invisibles superposées exactement au
- * bon endroit, PAR-DESSUS l'image.
- *
- * Remplace entièrement l'ancien système de thème personnalisé
- * (positionnement libre par élément, palette de couleurs, effets) —
- * la personnalisation se limite désormais à changer l'image du
- * boîtier elle-même (voir SkinContext).
+ * Le viseur et le compte-poses sont désormais rendus AU-DESSUS de
+ * l'image du boîtier (pas révélés à travers une découpe) — certains
+ * habillages n'ont pas de vraie transparence, cette approche marche
+ * dans tous les cas sans distinction.
  */
 export const HOTSPOTS = {
   landscape: {
-    skin: "/skins/default-horizontal.webp",
-    mask: "/skins/mask-horizontal.webp",
-    windowsCutout: "/skins/windows-cutout-horizontal.webp",
     wheelAxis: "horizontal", // glissé gauche→droite
+    mask: "/skins/mask-horizontal.webp",
     viewfinder: { x: 47.7, y: 10.9, w: 4.6, h: 7.4 },
     poseCounter: { x: 75.4, y: 65.3, w: 5.7, h: 7.5 },
     flashButton: { x: 71, y: 12.3, w: 9.3, h: 9.3 },
-    // Zone de clic élargie mais modérée (l'agrandissement précédent
-    // grignotait trop l'espace disponible pour les instructions).
     shutter: { x: 49.7, y: 75.8, w: 20, h: 20 },
-    // Zone de clic élargie (plus facile à viser), mais le crantage
-    // visuel doit rester sur la vraie molette dessinée : voir
-    // filmWheelVisual, mesure d'origine avant agrandissement.
     filmWheel: { x: 91, y: 11, w: 26, h: 18 },
     filmWheelVisual: { w: 20, h: 14 },
-    // Zone vide entre la grip du haut (viseur/flash/molette, finit vers
-    // 17%) et la zone déclencheur/poses du bas (débute vers 65.8%) —
-    // marge de sécurité large (>8%) des deux côtés, plus généreuse que
-    // le minimum de 5% demandé pour absorber toute variation d'écran.
     instructionsZone: { x: 50, y: 39, w: 88, h: 25 },
   },
   portrait: {
-    skin: "/skins/default-vertical.webp",
-    mask: "/skins/mask-vertical.webp",
-    windowsCutout: "/skins/windows-cutout-vertical.webp",
     wheelAxis: "vertical", // glissé haut→bas
+    mask: "/skins/mask-vertical.webp",
     viewfinder: { x: 49.9, y: 7.6, w: 9.7, h: 4.1 },
     poseCounter: { x: 85.3, y: 82.6, w: 9.7, h: 3.9 },
     flashButton: { x: 84.6, y: 26.2, w: 14, h: 14 },
     shutter: { x: 48.9, y: 73.3, w: 20, h: 20 },
     filmWheel: { x: 89.9, y: 8.9, w: 13, h: 19 },
     filmWheelVisual: { w: 10, h: 18 },
-    // Le flash occupe la colonne droite jusqu'à y≈33% — zone
-    // d'instructions resserrée avec marge large des deux côtés
-    // (>6.5%) plutôt que le minimum tout juste suffisant d'avant.
     instructionsZone: { x: 50, y: 48, w: 86, h: 15 },
   },
 };
+
+/**
+ * Thèmes préréglés (fournis avec l'app, pas d'upload nécessaire) —
+ * chacun a sa propre image par orientation, mode d'emploi déjà gravé
+ * dedans. À la différence d'un thème personnalisé, pas de couleur de
+ * mécanisme à choisir : l'habillage est complet tel quel.
+ */
+export const PRESET_THEMES = {
+  default: {
+    name: "Jaune classique",
+    swatch: "#f5c518",
+    landscape: "/skins/default-horizontal.webp",
+    portrait: "/skins/default-vertical.webp",
+  },
+  mariage: {
+    name: "Mariage",
+    swatch: "#e9dfc8",
+    landscape: "/skins/mariage-horizontal.webp",
+    portrait: "/skins/mariage-vertical.webp",
+  },
+  retro: {
+    name: "Rétro",
+    swatch: "#1a1a1a",
+    landscape: "/skins/retro-horizontal.webp",
+    portrait: "/skins/retro-vertical.webp",
+  },
+};
+
+export function isPresetId(id) {
+  return typeof id === "string" && id.startsWith("preset:");
+}
+
+export function presetKeyFromId(id) {
+  return id.slice("preset:".length);
+}
 
 /**
  * Style CSS absolu (position:absolute) pour un hotspot donné, calculé

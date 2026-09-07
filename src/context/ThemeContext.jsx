@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { listenActiveThemeId, listenMyThemes, getThemeBackground } from "../firebase/firestore";
+import { isPresetId, presetKeyFromId } from "../utils/hotspots";
 
 const ThemeContext = createContext(null);
 
@@ -23,8 +24,11 @@ export function ThemeProvider({ children }) {
 
   // Quand le thème actif (ou la liste, le temps qu'elle arrive) change,
   // recharge le fond correspondant — jamais en temps réel, à la demande.
+  // Un thème préréglé ("preset:xxx") ou l'absence de thème ne nécessite
+  // aucun chargement Firestore : customSkin reste null, CameraBody se
+  // charge de résoudre l'image préréglée à partir de presetId.
   useEffect(() => {
-    if (!activeThemeId) {
+    if (!activeThemeId || isPresetId(activeThemeId)) {
       setCustomSkin(null);
       setMaskColor(null);
       return;
@@ -43,9 +47,11 @@ export function ThemeProvider({ children }) {
     };
   }, [activeThemeId, myThemes, user?.uid]);
 
+  const presetId = isPresetId(activeThemeId) ? presetKeyFromId(activeThemeId) : "default";
+
   return (
     <ThemeContext.Provider
-      value={{ customSkin, maskColor, activeThemeId, myThemes, setActiveThemeIdState }}
+      value={{ customSkin, maskColor, presetId, activeThemeId, myThemes, setActiveThemeIdState }}
     >
       {children}
     </ThemeContext.Provider>

@@ -26,9 +26,19 @@ const LINKS = [
     ),
   },
   {
+    to: "/themes",
+    label: "Thèmes",
+    desc: "Choisir l'habillage de l'appareil",
+    icon: (
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path fill="currentColor" d="M12 2a10 10 0 100 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A5.1 5.1 0 0022 10.5C22 5.8 17.5 2 12 2zM6.5 12a1.5 1.5 0 111.5-1.5A1.5 1.5 0 016.5 12zm3-4A1.5 1.5 0 119.5 6.5 1.5 1.5 0 019.5 8zm5 0a1.5 1.5 0 111.5-1.5A1.5 1.5 0 0114.5 8zm3 4a1.5 1.5 0 111.5-1.5 1.5 1.5 0 01-1.5 1.5z" />
+      </svg>
+    ),
+  },
+  {
     to: "/settings",
     label: "Réglages",
-    desc: "Personnaliser l'habillage de l'appareil",
+    desc: "Installation et aide",
     icon: (
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
         <path fill="currentColor" d="M19.4 13a7.4 7.4 0 000-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 00-1.7-1L15 3h-6l-.3 2.5a7.6 7.6 0 00-1.7 1l-2.4-1-2 3.4L4.6 11a7.4 7.4 0 000 2l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 001.7 1L9 21h6l.3-2.5a7.6 7.6 0 001.7-1l2.4 1 2-3.4L19.4 13zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z" />

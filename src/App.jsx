@@ -12,6 +12,7 @@ import CameraPage from "./pages/CameraPage";
 // initial de l'écran caméra, de loin le plus visité.
 const GalleryPage = lazy(() => import("./pages/GalleryPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const ThemesPage = lazy(() => import("./pages/ThemesPage"));
 const EventHubPage = lazy(() => import("./pages/EventHubPage"));
 const EventCreatePage = lazy(() => import("./pages/EventCreatePage"));
 const EventJoinPage = lazy(() => import("./pages/EventJoinPage"));
@@ -34,6 +35,7 @@ export default function App() {
                     <Route path="/" element={<CameraPage />} />
                     <Route path="/gallery" element={<GalleryPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="/themes" element={<ThemesPage />} />
                     <Route path="/event" element={<EventHubPage />} />
                     <Route path="/event/new" element={<EventCreatePage />} />
                     <Route path="/event/:eventId" element={<EventDashboardPage />} />
