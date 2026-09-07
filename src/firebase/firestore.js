@@ -192,15 +192,42 @@ export async function deletePhoto(photoId) {
 
 // ---------- Événements ----------
 
-function makeInviteCode() {
-  return Math.random().toString(36).slice(2, 8).toUpperCase();
+function slugify(text) {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-export async function createEvent(organizerId, { name, shotsPerGuest, revealDate }) {
-  const inviteCode = makeInviteCode();
+async function inviteCodeExists(code) {
+  const snap = await getDocs(query(collection(db, "events"), where("inviteCode", "==", code)));
+  return !snap.empty;
+}
+
+/**
+ * Code d'invitation lisible (ex: "EVG-THOMAS") plutôt qu'une suite de
+ * caractères aléatoires — dérivé du type d'événement et du nom, avec
+ * un suffixe numérique en cas de collision (rare mais possible).
+ */
+async function makeInviteCode(eventType, name) {
+  const base = `${eventType ? slugify(eventType) + "-" : ""}${slugify(name)}`.slice(0, 40) || "EVENT";
+  let code = base;
+  let suffix = 2;
+  while (await inviteCodeExists(code)) {
+    code = `${base}-${suffix}`;
+    suffix++;
+  }
+  return code;
+}
+
+export async function createEvent(organizerId, { name, eventType = null, shotsPerGuest, revealDate }) {
+  const inviteCode = await makeInviteCode(eventType, name);
   const docRef = await addDoc(collection(db, "events"), {
     organizerId,
     name,
+    eventType,
     shotsPerGuest,
     revealAt: Timestamp.fromDate(new Date(revealDate)),
     inviteCode,

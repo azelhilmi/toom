@@ -36,3 +36,21 @@ export async function shareImage(dataUrl, filename = "toom.jpg") {
     return err.name === "AbortError" ? "cancelled" : "unsupported";
   }
 }
+
+/**
+ * Ouvre la feuille de partage native pour un texte/lien (pas un
+ * fichier) — utilisé pour inviter à un événement. Sur les navigateurs
+ * qui ne supportent pas l'API, l'appelant doit prévoir un repli
+ * (copie dans le presse-papiers par exemple).
+ *
+ * @returns {Promise<"shared"|"cancelled"|"unsupported">}
+ */
+export async function shareInvite({ title, text, url }) {
+  if (!navigator.share) return "unsupported";
+  try {
+    await navigator.share({ title, text, url });
+    return "shared";
+  } catch (err) {
+    return err.name === "AbortError" ? "cancelled" : "unsupported";
+  }
+}

@@ -59,6 +59,12 @@ export const PRESET_THEMES = {
     landscape: "/skins/retro-horizontal.webp",
     portrait: "/skins/retro-vertical.webp",
   },
+  neon90s: {
+    name: "90's",
+    swatch: "#ff5fae",
+    landscape: "/skins/90s-horizontal.webp",
+    portrait: "/skins/90s-vertical.webp",
+  },
 };
 
 export function isPresetId(id) {

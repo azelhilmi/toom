@@ -31,6 +31,16 @@
   user-select: none;
 }
 
+.camera-body__skin-relief-tint {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  mix-blend-mode: color;
+}
+
 
 
 .camera-body__viewfinder-slot,

@@ -99,26 +99,28 @@ export default function CameraBody({
       <img className="camera-body__skin" src={skinSrc} alt="" draggable={false} />
 
       {/* Sur une image personnalisée uniquement : le mécanisme (boutons,
-          molette, grip) reste visible par-dessus — recoloré si le thème
-          choisit une couleur, ou affiché tel quel dans son gris naturel
-          si le thème choisit "transparent". */}
-      {customSkin && maskColor && maskColor !== "transparent" ? (
-        <div
-          className="camera-body__skin-relief"
-          style={{
-            backgroundColor: maskColor,
-            WebkitMaskImage: `url(${layout.mask})`,
-            maskImage: `url(${layout.mask})`,
-            WebkitMaskSize: "100% 100%",
-            maskSize: "100% 100%",
-            WebkitMaskRepeat: "no-repeat",
-            maskRepeat: "no-repeat",
-          }}
-        />
-      ) : (
-        customSkin && (
+          molette, grip) reste TOUJOURS visible avec son relief d'origine.
+          Une couleur choisie s'applique par-dessus comme une teinte
+          (mix-blend-mode: color) — elle colore sans jamais remplacer le
+          dessin ni aplatir ses ombres/reflets. */}
+      {customSkin && (
+        <>
           <img className="camera-body__skin-relief" src={layout.mask} alt="" draggable={false} />
-        )
+          {maskColor && maskColor !== "transparent" && (
+            <div
+              className="camera-body__skin-relief-tint"
+              style={{
+                backgroundColor: maskColor,
+                WebkitMaskImage: `url(${layout.mask})`,
+                maskImage: `url(${layout.mask})`,
+                WebkitMaskSize: "100% 100%",
+                maskSize: "100% 100%",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+              }}
+            />
+          )}
+        </>
       )}
 
       {/* Couche 2 : viseur et compte-poses, par-dessus l'image, exactement

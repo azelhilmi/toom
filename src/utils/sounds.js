@@ -10,80 +10,91 @@ function getContext() {
 }
 
 /**
- * Petit "tic" sec et aigu — imite le déclic mécanique d'une molette
- * crantée à chaque cran franchi.
+ * Crée un buffer de bruit blanc filtré, l'ingrédient de base de tout
+ * son "mécanique" convaincant (un vrai clic n'est jamais une onde pure,
+ * c'est une explosion de bruit avec une couleur spectrale précise).
+ */
+function makeNoiseBurst(c, durationSec) {
+  const bufferSize = Math.max(1, Math.floor(c.sampleRate * durationSec));
+  const buffer = c.createBuffer(1, bufferSize, c.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+  const src = c.createBufferSource();
+  src.buffer = buffer;
+  return src;
+}
+
+function noiseClick(c, { start, duration, freq, q, gain, type = "bandpass" }) {
+  const noise = makeNoiseBurst(c, duration);
+  const filter = c.createBiquadFilter();
+  filter.type = type;
+  filter.frequency.value = freq;
+  filter.Q.value = q;
+  const g = c.createGain();
+  g.gain.setValueAtTime(gain, start);
+  g.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  noise.connect(filter).connect(g).connect(c.destination);
+  noise.start(start);
+}
+
+function tonalPop(c, { start, duration, freqFrom, freqTo, gain, type = "sine" }) {
+  const osc = c.createOscillator();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freqFrom, start);
+  if (freqTo !== freqFrom) osc.frequency.exponentialRampToValueAtTime(freqTo, start + duration);
+  const g = c.createGain();
+  g.gain.setValueAtTime(gain, start);
+  g.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  osc.connect(g).connect(c.destination);
+  osc.start(start);
+  osc.stop(start + duration);
+}
+
+/**
+ * Cran de molette crantée : un clic sec et haut, comme un vrai
+ * cliquet — bruit filtré étroit + un soupçon de composante tonale.
  */
 export function playWheelTick() {
   const c = getContext();
   if (!c) return;
-  const osc = c.createOscillator();
-  const gain = c.createGain();
-  osc.type = "square";
-  osc.frequency.value = 1400;
-  gain.gain.setValueAtTime(0.06, c.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.03);
-  osc.connect(gain).connect(c.destination);
-  osc.start();
-  osc.stop(c.currentTime + 0.03);
+  const now = c.currentTime;
+  noiseClick(c, { start: now, duration: 0.02, freq: 3200, q: 3.5, gain: 0.22 });
+  tonalPop(c, { start: now, duration: 0.015, freqFrom: 1800, freqTo: 1200, gain: 0.03, type: "triangle" });
 }
 
 /**
- * Petit "clac" plus grave et plus plein — la pellicule vient de
- * s'armer complètement.
+ * Pellicule complètement armée : deux clics rapprochés, plus grave
+ * que le tic de cran.
  */
 export function playWheelArmed() {
   const c = getContext();
   if (!c) return;
-  const osc = c.createOscillator();
-  const gain = c.createGain();
-  osc.type = "triangle";
-  osc.frequency.setValueAtTime(500, c.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(200, c.currentTime + 0.08);
-  gain.gain.setValueAtTime(0.12, c.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.1);
-  osc.connect(gain).connect(c.destination);
-  osc.start();
-  osc.stop(c.currentTime + 0.1);
+  const now = c.currentTime;
+  noiseClick(c, { start: now, duration: 0.035, freq: 1400, q: 2.5, gain: 0.28 });
+  noiseClick(c, { start: now + 0.045, duration: 0.02, freq: 2000, q: 3, gain: 0.14 });
+  tonalPop(c, { start: now, duration: 0.09, freqFrom: 420, freqTo: 180, gain: 0.1, type: "triangle" });
 }
 
 /**
- * Déclic d'obturateur : un bref souffle de bruit filtré (le "clac"
- * mécanique) suivi d'un tic plus aigu (le retour du miroir/rideau) —
- * synthétisé plutôt que chargé, pour ne dépendre d'aucun fichier audio.
+ * Déclic d'obturateur d'un jetable : trois couches qui se chevauchent
+ * légèrement, comme un vrai mécanisme —
+ *  1. le "clac" principal, sec et plein
+ *  2. le rideau qui se libère, plus aigu et bref, juste après
+ *  3. le petit retour métallique du ressort, très bref, en dernier
  */
 export function playShutter() {
   const c = getContext();
   if (!c) return;
   const now = c.currentTime;
 
-  // Bruit filtré bref (le "clac" principal).
-  const bufferSize = Math.floor(c.sampleRate * 0.06);
-  const buffer = c.createBuffer(1, bufferSize, c.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-  }
-  const noise = c.createBufferSource();
-  noise.buffer = buffer;
-  const bandpass = c.createBiquadFilter();
-  bandpass.type = "bandpass";
-  bandpass.frequency.value = 1800;
-  bandpass.Q.value = 0.7;
-  const noiseGain = c.createGain();
-  noiseGain.gain.setValueAtTime(0.35, now);
-  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-  noise.connect(bandpass).connect(noiseGain).connect(c.destination);
-  noise.start(now);
+  noiseClick(c, { start: now, duration: 0.05, freq: 1200, q: 1.1, gain: 0.4, type: "bandpass" });
+  noiseClick(c, { start: now, duration: 0.03, freq: 3400, q: 2, gain: 0.18 });
+  tonalPop(c, { start: now, duration: 0.045, freqFrom: 150, freqTo: 70, gain: 0.22, type: "sine" });
 
-  // Petit tic aigu juste après (retour du mécanisme).
-  const osc = c.createOscillator();
-  const oscGain = c.createGain();
-  osc.type = "square";
-  osc.frequency.value = 2200;
-  oscGain.gain.setValueAtTime(0, now);
-  oscGain.gain.setValueAtTime(0.05, now + 0.05);
-  oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
-  osc.connect(oscGain).connect(c.destination);
-  osc.start(now);
-  osc.stop(now + 0.09);
+  noiseClick(c, { start: now + 0.03, duration: 0.025, freq: 2600, q: 2.5, gain: 0.16 });
+
+  noiseClick(c, { start: now + 0.075, duration: 0.015, freq: 4200, q: 4, gain: 0.08 });
+  tonalPop(c, { start: now + 0.075, duration: 0.02, freqFrom: 2800, freqTo: 2800, gain: 0.02, type: "square" });
 }

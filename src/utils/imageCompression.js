@@ -44,12 +44,66 @@ export async function captureFramePrintQuality(videoEl, { eventName = null } = {
 
   drawDateStamp(ctx, width, height, { eventName });
 
-  const webpBlob = await canvasToBlob(canvas, "image/webp", IMAGE_QUALITY);
+  const bordered = addAgedBorder(canvas);
+
+  const webpBlob = await canvasToBlob(bordered, "image/webp", IMAGE_QUALITY);
   if (webpBlob && webpBlob.type === "image/webp") return webpBlob;
 
   // Repli : navigateur sans encodage WebP (canvas.toBlob renvoie alors
   // soit null, soit silencieusement un PNG non compressé selon les cas).
-  return canvasToBlob(canvas, "image/jpeg", IMAGE_QUALITY);
+  return canvasToBlob(bordered, "image/jpeg", IMAGE_QUALITY);
+}
+
+/**
+ * Ajoute un contour façon tirage physique — blanc cassé, légèrement
+ * vieilli (grain très fin + coins qui jaunissent un peu), autour de la
+ * photo. Appliqué en tout dernier : le date-stamp gravé plus haut est
+ * déjà à l'intérieur de la zone image, jamais recouvert par le cadre.
+ */
+function addAgedBorder(sourceCanvas) {
+  const border = Math.round(sourceCanvas.width * 0.045);
+  const out = document.createElement("canvas");
+  out.width = sourceCanvas.width + border * 2;
+  out.height = sourceCanvas.height + border * 2;
+  const ctx = out.getContext("2d");
+
+  // Blanc cassé plutôt que blanc pur — un vrai tirage n'est jamais
+  // neutre, et un dégradé très subtil évite l'aplat trop "numérique".
+  const gradient = ctx.createLinearGradient(0, 0, out.width, out.height);
+  gradient.addColorStop(0, "#f7f2e7");
+  gradient.addColorStop(0.5, "#faf7f0");
+  gradient.addColorStop(1, "#f4efe2");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, out.width, out.height);
+
+  // Grain très fin sur le cadre seulement (pas sur la photo).
+  const imageData = ctx.getImageData(0, 0, out.width, out.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const noise = (Math.random() - 0.5) * 6;
+    data[i] += noise;
+    data[i + 1] += noise;
+    data[i + 2] += noise;
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  // Légers coins jaunis, comme un vieux tirage rangé dans un album.
+  ctx.save();
+  ctx.globalCompositeOperation = "multiply";
+  const corner = ctx.createRadialGradient(0, 0, 0, 0, 0, out.width * 0.35);
+  corner.addColorStop(0, "rgba(214, 186, 132, 0.35)");
+  corner.addColorStop(1, "rgba(214, 186, 132, 0)");
+  for (const [cx, cy] of [[0, 0], [out.width, 0], [0, out.height], [out.width, out.height]]) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = corner;
+    ctx.fillRect(-out.width * 0.35, -out.height * 0.35, out.width * 0.7, out.height * 0.7);
+    ctx.restore();
+  }
+  ctx.restore();
+
+  ctx.drawImage(sourceCanvas, border, border);
+  return out;
 }
 
 function canvasToBlob(canvas, mime, quality) {

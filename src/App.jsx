@@ -15,6 +15,7 @@ const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const ThemesPage = lazy(() => import("./pages/ThemesPage"));
 const EventHubPage = lazy(() => import("./pages/EventHubPage"));
 const EventCreatePage = lazy(() => import("./pages/EventCreatePage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
 const EventJoinPage = lazy(() => import("./pages/EventJoinPage"));
 const JoinByCodePage = lazy(() => import("./pages/JoinByCodePage"));
 const EventCameraPage = lazy(() => import("./pages/EventCameraPage"));
@@ -38,6 +39,7 @@ export default function App() {
                     <Route path="/themes" element={<ThemesPage />} />
                     <Route path="/event" element={<EventHubPage />} />
                     <Route path="/event/new" element={<EventCreatePage />} />
+                    <Route path="/terms" element={<TermsPage />} />
                     <Route path="/event/:eventId" element={<EventDashboardPage />} />
                     <Route path="/event/:eventId/camera" element={<EventCameraPage />} />
                     <Route path="/join" element={<JoinByCodePage />} />
