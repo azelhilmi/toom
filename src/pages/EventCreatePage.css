@@ -296,3 +296,125 @@
   cursor: pointer;
   padding: 0.4rem;
 }
+
+.event-wizard__logo {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  left: 1.4rem;
+  width: 32px;
+  height: 32px;
+  z-index: 5;
+}
+
+/* --- Formulaire simple (rejoindre un événement par lien/code) ---
+   Distinct de l'assistant .event-wizard, utilisé par EventJoinPage et
+   JoinByCodePage, des flux à une seule étape. */
+
+.event-form {
+  max-width: 420px;
+  margin: 2rem auto;
+  padding: 1.8rem 1.6rem;
+  background: var(--paper-alt, #fff);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  font-family: var(--font-body);
+  color: var(--ink, #1c1a17);
+  border: 1px solid var(--border-soft, rgba(0, 0, 0, 0.08));
+  box-shadow: 0 20px 50px rgba(28, 26, 23, 0.08);
+  position: relative;
+  animation: page-fade-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.event-form__logo {
+  width: 36px;
+  height: 36px;
+  margin-bottom: -0.4rem;
+}
+
+.event-form h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--ink, #1c1a17);
+  letter-spacing: -0.01em;
+}
+
+.event-form p {
+  color: var(--ink-soft, #746b5f);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.event-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft, #8a8071);
+}
+
+.event-form input:not([type="checkbox"]):not([type="color"]) {
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-soft, rgba(0, 0, 0, 0.1));
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  background: #faf7f2;
+  color: var(--ink, #1c1a17);
+  text-transform: none;
+  letter-spacing: normal;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.event-form input:focus {
+  outline: none;
+  border-color: #c8102e;
+  background: #fff;
+}
+
+.event-form button[type="submit"] {
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(180deg, #e63946 0%, #a11d1d 100%);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(200, 16, 46, 0.25);
+  transition: transform 0.1s ease;
+}
+
+.event-form button[type="submit"]:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.event-form button[type="submit"]:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.event-form__code-input {
+  text-transform: uppercase !important;
+  letter-spacing: 0.15em !important;
+  font-family: monospace;
+  text-align: center;
+  font-size: 1.2rem !important;
+}
+
+.event-form__error {
+  color: #c8102e;
+  font-size: 0.82rem;
+  margin: 0;
+  font-weight: 600;
+}

@@ -8,7 +8,7 @@ export default function SettingsPage() {
   const [tutorialResetDone, setTutorialResetDone] = useState(false);
 
   return (
-    <div className="settings-page page-enter">
+    <div className="settings-page page-enter watermark-bg">
       <header className="settings-page__header">
         <div>
           <img src="/brand/icon-round-small.webp" alt="" className="page-header-logo" />

@@ -103,8 +103,9 @@ export default function EventCreatePage() {
   }
 
   return (
-    <div className="event-wizard">
+    <div className="event-wizard watermark-bg">
       <BackToCameraButton />
+      <img src="/brand/icon-round-small.webp" alt="Toom" className="event-wizard__logo" />
       {step < 4 && (
         <div className="event-wizard__progress">
           <div className="event-wizard__gauge">

@@ -26,8 +26,9 @@ export default function JoinByCodePage() {
   }
 
   return (
-    <form className="event-form" onSubmit={handleSubmit}>
+    <form className="event-form watermark-bg" onSubmit={handleSubmit}>
       <BackToCameraButton />
+      <img src="/brand/icon-round-small.webp" alt="Toom" className="event-form__logo" />
       <h2>Rejoindre un événement</h2>
       <p>Saisis le code communiqué par l'organisateur.</p>
       <label>

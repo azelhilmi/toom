@@ -30,8 +30,9 @@ export default function EventJoinPage() {
   }
 
   return (
-    <form className="event-form" onSubmit={handleSubmit}>
+    <form className="event-form watermark-bg" onSubmit={handleSubmit}>
       <BackToCameraButton />
+      <img src="/brand/icon-round-small.webp" alt="Toom" className="event-form__logo" />
       <h2>{event.name}</h2>
       <p>Tu es invité·e à immortaliser ce moment avec un appareil jetable virtuel. Tes photos seront révélées le jour J.</p>
       <label>

@@ -101,7 +101,7 @@ export default function ThemesPage() {
     key === "default" ? !activeThemeId : activeThemeId === `preset:${key}`;
 
   return (
-    <div className="themes-page page-enter">
+    <div className="themes-page page-enter watermark-bg">
       {pendingFile && (
         <ImageCropModal
           file={pendingFile}

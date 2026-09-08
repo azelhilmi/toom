@@ -51,7 +51,7 @@ export default function GalleryPage() {
   const openCollection = openDay ? collections.find(([key]) => key === openDay) : null;
 
   return (
-    <div className="gallery-page page-enter">
+    <div className="gallery-page page-enter watermark-bg">
       <header className="gallery-page__header">
         <div>
           <img src="/brand/icon-round-small.webp" alt="" className="page-header-logo" />

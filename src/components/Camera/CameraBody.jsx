@@ -93,10 +93,12 @@ export default function CameraBody({
   return (
     <div className="camera-body" onPointerDownCapture={tryEnterFullscreen}>
       {/* Couche 1 : l'image du boîtier — préréglée ou personnalisée,
-          étirée pour remplir exactement l'écran. Le viseur et le
-          compte-poses se dessinent PAR-DESSUS (couche 2), pas révélés
-          à travers une découpe : certains habillages n'ont pas de
-          vraie transparence, cette approche marche dans tous les cas. */}
+          étirée pour remplir exactement l'écran. Tous les thèmes ont
+          désormais une vraie transparence aux fenêtres viseur/compteur,
+          révélées PAR-DESSOUS (couche en dessous, z-index inférieur),
+          pas superposées : évite l'effet de carré/bordure visible
+          d'un fond opaque qui ne correspond jamais exactement au
+          contour dessiné dans l'image. */}
       <img className="camera-body__skin" src={skinSrc} alt="" draggable={false} />
 
       {/* Sur une image personnalisée uniquement : le mécanisme (boutons,

@@ -84,3 +84,25 @@ input::placeholder {
 button, a {
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Filigrane "Toom" en mosaïque, discret, pour habiller le fond des
+   pages de menu (Galerie, Événements, Thèmes, Réglages...). Un simple
+   ::before pleine page en position fixe, sous le contenu. */
+.watermark-bg {
+  position: relative;
+  isolation: isolate;
+}
+
+.watermark-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("/brand/wordmark-tile.webp");
+  background-repeat: repeat;
+  background-size: 130px auto;
+  opacity: 0.05;
+  transform: rotate(-12deg) scale(1.4);
+  transform-origin: center;
+  pointer-events: none;
+}

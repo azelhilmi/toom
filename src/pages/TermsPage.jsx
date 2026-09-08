@@ -3,8 +3,9 @@ import "./TermsPage.css";
 
 export default function TermsPage() {
   return (
-    <div className="terms-page">
+    <div className="terms-page watermark-bg">
       <BackToCameraButton />
+      <img src="/brand/icon-round-small.webp" alt="Toom" className="page-header-logo" />
       <h1>Conditions Générales d'Utilisation</h1>
       <p className="terms-page__updated">Dernière mise à jour : septembre 2026</p>
 

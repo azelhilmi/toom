@@ -15,7 +15,7 @@ export default function EventHubPage() {
   }, [user?.uid]);
 
   return (
-    <div className="event-hub page-enter">
+    <div className="event-hub page-enter watermark-bg">
       <img src="/brand/icon-round.webp" alt="" className="event-hub__logo" />
       <h1>Événement</h1>
       <p>Organise une pellicule partagée pour un mariage, un anniversaire, une soirée…</p>

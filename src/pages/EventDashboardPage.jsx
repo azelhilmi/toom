@@ -196,10 +196,11 @@ export default function EventDashboardPage() {
   if (!event || !form) return <LoadingScreen />;
 
   return (
-    <div className="event-dashboard">
+    <div className="event-dashboard watermark-bg">
       <BackToCameraButton />
       <header className="event-dashboard__header">
         <div>
+          <img src="/brand/icon-round-small.webp" alt="" className="page-header-logo" />
           <h2>{event.name}</h2>
           <p className="event-dashboard__subtitle">
             {photos.length} photo{photos.length > 1 ? "s" : ""} · {guests.length} invité{guests.length > 1 ? "s" : ""}

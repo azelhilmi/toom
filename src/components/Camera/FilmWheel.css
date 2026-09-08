@@ -6,16 +6,11 @@
   cursor: grab;
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 calc(var(--wheel-progress, 0) * 2px) var(--flash-on, #ff5a3c);
   background: radial-gradient(
     ellipse,
     color-mix(in srgb, var(--flash-on, #ff5a3c) calc(var(--wheel-progress, 0) * 40%), transparent) 0%,
     transparent 75%
   );
-}
-
-.film-wheel-hotspot--armed {
-  box-shadow: 0 0 0 2px var(--flash-on, #ff5a3c);
 }
 
 .film-wheel-hotspot:active {
