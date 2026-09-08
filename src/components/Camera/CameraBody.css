@@ -85,37 +85,4 @@
   cursor: not-allowed;
 }
 
-.camera-body__status-label {
-  position: absolute;
-  left: 4.5rem;
-  right: 4%;
-  bottom: max(1.2rem, env(safe-area-inset-bottom));
-  z-index: 5;
-  background: rgba(10, 10, 10, 0.75);
-  backdrop-filter: blur(4px);
-  border: 2px solid #c8102e;
-  border-radius: 10px;
-  padding: 0.6rem 0.9rem;
-}
 
-/* En paysage, le déclencheur est centré en bas et la galerie occupe
-   le bas-gauche — bandeau de statut basculé à droite, hors de leurs
-   zones respectives (et de celle du compte-poses). */
-@media (orientation: landscape) {
-  .camera-body__status-label {
-    left: auto;
-    right: 3%;
-    width: 33%;
-    bottom: 8%;
-  }
-}
-
-.camera-body__status-text {
-  margin: 0;
-  font-family: var(--font-display, "Rockwell", serif);
-  font-weight: 800;
-  font-size: clamp(0.85rem, 3.6vmin, 1.15rem);
-  color: #fff;
-  text-align: center;
-  line-height: 1.25;
-}

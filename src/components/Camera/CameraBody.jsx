@@ -7,6 +7,7 @@ import HamburgerMenu from "../UI/HamburgerMenu";
 import GalleryShortcut from "../UI/GalleryShortcut";
 import DevelopClock from "./DevelopClock";
 import OnboardingTutorial from "./OnboardingTutorial";
+import StatusBanner from "./StatusBanner";
 import { hasSeenOnboarding } from "../../utils/onboarding";
 import { useCameraStream } from "../../utils/useCameraStream";
 import { requestAppFullscreen } from "../../utils/fullscreen";
@@ -78,9 +79,9 @@ export default function CameraBody({
       hapticCapture();
       playShutter();
       await onCapture(videoRef.current, flashOn);
-      setFeedback("Cliché capturé. Rendez-vous demain pour le découvrir.");
+      setFeedback({ type: "success", text: "Cliché capturé. Rendez-vous demain pour le découvrir." });
     } catch (e) {
-      setFeedback("La prise de vue a échoué, réessaie.");
+      setFeedback({ type: "error", text: "La prise de vue a échoué, réessaie." });
     } finally {
       if (torchWasLit) applyTorch(false);
       setArmed(false);
@@ -170,15 +171,16 @@ export default function CameraBody({
       <GalleryShortcut />
 
       {(outOfFilm || feedback || armed) && (
-        <div className="camera-body__status-label">
-          <p className="camera-body__status-text" role="status">
-            {outOfFilm
+        <StatusBanner
+          type={outOfFilm ? "film" : feedback ? feedback.type : "ready"}
+          text={
+            outOfFilm
               ? "Pellicule épuisée — regarde l'heure de développement ci-dessus."
               : feedback
-              ? feedback
-              : "Prêt ! Appuie sur le déclencheur."}
-          </p>
-        </div>
+              ? feedback.text
+              : "Prêt ! Appuie sur le déclencheur."
+          }
+        />
       )}
 
       {showOnboarding && !developingUntilMs && (
