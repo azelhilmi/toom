@@ -155,8 +155,8 @@ export default function CameraBody({
           disabled={outOfFilm}
           onArmed={() => setArmed(true)}
           axis={layout.wheelAxis}
-          hotspotSize={layout.filmWheel}
-          visualSize={layout.filmWheelVisual}
+          hotspotSpec={layout.filmWheel}
+          visualSpec={layout.filmWheelVisual}
           bare
         />
       </div>

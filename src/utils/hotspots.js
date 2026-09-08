@@ -18,7 +18,7 @@ export const HOTSPOTS = {
     flashButton: { x: 71, y: 12.3, w: 9.3, h: 9.3 },
     shutter: { x: 49.7, y: 75.8, w: 20, h: 20 },
     filmWheel: { x: 91, y: 11, w: 26, h: 18 },
-    filmWheelVisual: { w: 20, h: 14 },
+    filmWheelVisual: { x: 88.4, y: 10.8, w: 13.2, h: 7.2 },
     instructionsZone: { x: 50, y: 39, w: 88, h: 25 },
   },
   portrait: {
@@ -29,7 +29,7 @@ export const HOTSPOTS = {
     flashButton: { x: 84.6, y: 26.2, w: 14, h: 14 },
     shutter: { x: 48.9, y: 73.3, w: 20, h: 20 },
     filmWheel: { x: 89.9, y: 8.9, w: 13, h: 19 },
-    filmWheelVisual: { w: 10, h: 18 },
+    filmWheelVisual: { x: 91.4, y: 8.8, w: 11.6, h: 12.7 },
     instructionsZone: { x: 50, y: 48, w: 86, h: 15 },
   },
 };
@@ -80,6 +80,26 @@ export function presetKeyFromId(id) {
  * à partir des pourcentages ci-dessus. Le conteneur parent doit être
  * position:relative et couvrir tout le boîtier.
  */
+/**
+ * Position/taille (en % du conteneur parent) d'une zone `inner` à
+ * l'intérieur d'une zone `outer` — utile quand la zone de clic (grande,
+ * pour faciliter le geste) et le visuel réel (petit, précisément
+ * calé sur le dessin du boîtier) n'ont pas le même centre.
+ */
+export function relativeHotspotStyle(outer, inner) {
+  const outerLeft = outer.x - outer.w / 2;
+  const outerTop = outer.y - outer.h / 2;
+  const innerLeft = inner.x - inner.w / 2;
+  const innerTop = inner.y - inner.h / 2;
+  return {
+    position: "absolute",
+    left: `${((innerLeft - outerLeft) / outer.w) * 100}%`,
+    top: `${((innerTop - outerTop) / outer.h) * 100}%`,
+    width: `${(inner.w / outer.w) * 100}%`,
+    height: `${(inner.h / outer.h) * 100}%`,
+  };
+}
+
 export function hotspotStyle(spot) {
   return {
     position: "absolute",

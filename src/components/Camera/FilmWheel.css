@@ -26,21 +26,17 @@
    rotation vient du défilement continu (--wheel-roll), pas d'une vraie
    rotation d'image (la molette réelle est peinte dans le boîtier). */
 .film-wheel-hotspot__ridges {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.15s ease;
   border-radius: 4px;
   background-image: repeating-linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.55) 0px,
-    rgba(255, 255, 255, 0.55) 2px,
-    rgba(0, 0, 0, 0.35) 2px,
-    rgba(0, 0, 0, 0.35) 4px,
-    transparent 4px,
-    transparent 8px
+    rgba(255, 255, 255, 0.55) 0,
+    rgba(255, 255, 255, 0.55) 0.5vmin,
+    rgba(0, 0, 0, 0.35) 0.5vmin,
+    rgba(0, 0, 0, 0.35) 1vmin,
+    transparent 1vmin,
+    transparent 2vmin
   );
   background-position: var(--wheel-roll, 0) 0;
   mix-blend-mode: overlay;
@@ -50,12 +46,12 @@
 .film-wheel-hotspot--vertical .film-wheel-hotspot__ridges {
   background-image: repeating-linear-gradient(
     0deg,
-    rgba(255, 255, 255, 0.55) 0px,
-    rgba(255, 255, 255, 0.55) 2px,
-    rgba(0, 0, 0, 0.35) 2px,
-    rgba(0, 0, 0, 0.35) 4px,
-    transparent 4px,
-    transparent 8px
+    rgba(255, 255, 255, 0.55) 0,
+    rgba(255, 255, 255, 0.55) 0.5vmin,
+    rgba(0, 0, 0, 0.35) 0.5vmin,
+    rgba(0, 0, 0, 0.35) 1vmin,
+    transparent 1vmin,
+    transparent 2vmin
   );
   background-position: 0 var(--wheel-roll, 0);
 }
